@@ -20,7 +20,7 @@ public class App
         {
             MainMenuConsole();
     
-            switch (MakeChoice())
+            switch (UserMakeChoice())
             {
                 case 1:
                     UserPrintAllBooks();
@@ -32,10 +32,16 @@ public class App
                     UserDeleteBook();
                     break;
                 case 4:
-                    BorrowBook();
+                    UserBorrowBook();
                     break;
                 case 5: 
-                    ReturnBook();
+                    UserReturnBook();
+                    break;
+                case 6:
+                    UserFindBookByAuthor();
+                    break;
+                case 7:
+                    UserFindBookByTitle();
                     break;
                 default:
                     return;
@@ -77,17 +83,31 @@ public class App
         _fm.WriteBooksToFile(_lib.GetBooks());
     }
 
-    public void MainMenuConsole()
+    private void UserFindBookByAuthor()
     {
-        Console.WriteLine("Choose Operation: \n 1 - Read Library \n 2 - Add new book \n 3 - Delete book \n 4 - Borrow Book \n 5 - Return Book \n Any button to exit ");
+        Console.WriteLine("Enter the author to find: ");
+        var input = Console.ReadLine();
+        ConsolePrintBooksList(_lib.SearchBookByAuthor(input));
+    }
+    
+    private void UserFindBookByTitle()
+    {
+        Console.WriteLine("Enter the title to find: ");
+        var input = Console.ReadLine();
+        ConsolePrintBooksList(_lib.SearchBookByTitle(input));
     }
 
-    public int MakeChoice()
+    private void MainMenuConsole()
+    {
+        Console.WriteLine("Choose Operation: \n 1 - Read Library \n 2 - Add new book \n 3 - Delete book \n 4 - Borrow Book \n 5 - Return Book \n 6 - Search by the author \n 7 - Search by the title \n Any button to exit ");
+    }
+
+    private int UserMakeChoice()
     {
         return Choice = int.Parse(Console.ReadLine());
     }
 
-    public void BorrowBook()
+    private void UserBorrowBook()
     {
         Console.WriteLine("Enter book ID to borrow or N to cancel");
         var input = Console.ReadLine();
@@ -109,7 +129,7 @@ public class App
         _fm.WriteBooksToFile(_lib.GetBooks());
     }
     
-    public void ReturnBook()
+    private void UserReturnBook()
     {
         Console.WriteLine("Enter book ID to return or N to cancel");
         var input = Console.ReadLine();
@@ -131,7 +151,7 @@ public class App
         _fm.WriteBooksToFile(_lib.GetBooks());
     }
     
-    public void ConsolePrintBooksList(List<Book> books)
+    private void ConsolePrintBooksList(List<Book> books)
     {
         if (books.Count != 0)
         {

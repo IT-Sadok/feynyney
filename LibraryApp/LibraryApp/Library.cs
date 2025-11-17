@@ -15,7 +15,7 @@ public class Library
 
     public void AddNewBook()
     {
-        Console.WriteLine("Book title: ");
+        Console.WriteLine("Book title: "); 
         string title = Console.ReadLine();
 
         Console.WriteLine("Book author: ");
@@ -43,6 +43,30 @@ public class Library
         };
 
         _books.Add(newBook);
+    }
+
+    public List<Book> SearchBookByAuthor(string author)
+    {
+        var bookToFind = _books.Where(b => b.Author.Contains(author, StringComparison.CurrentCultureIgnoreCase)).ToList();
+        
+        if (!bookToFind.Any()) 
+        {
+            Console.WriteLine("This author is not found");
+        }
+        
+        return bookToFind;
+    }
+    
+    public List<Book> SearchBookByTitle(string title)
+    {
+        var bookToFind = _books.Where(b => b.Title.Contains(title, StringComparison.CurrentCultureIgnoreCase)).ToList();
+        
+        if (!bookToFind.Any()) 
+        {
+            Console.WriteLine("This title is not found");
+        }
+        
+        return bookToFind;
     }
 
     public void BorrowBookById(int bookId)
