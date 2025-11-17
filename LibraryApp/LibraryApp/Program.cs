@@ -4,9 +4,9 @@ using LibraryApp;
 using LibraryApp.Managers;
 using LibraryApp.Models;
 
-Library lib = new Library();
 FileManager fm = new FileManager();
-App app = new App(lib, fm);
+Library lib = new Library(fm);
+App app = new App(lib);
 
 app.RunApp();
 

@@ -5,43 +5,41 @@ namespace LibraryApp.Managers;
 public class App
 {
     private Library _lib;
-    private FileManager _fm;
     public int Choice { get; set; }
     
-    public App(Library lib, FileManager fm)
+    public App(Library lib)
     {
         _lib = lib;
-        _fm = fm;
     }
     
     public void RunApp()
     {
         while (true)
         {
-            MainMenuConsole();
+            PrintMainMenuInConsole();
     
-            switch (UserMakeChoice())
+            switch (MakeChoiceInConsole())
             {
                 case 1:
-                    UserPrintAllBooks();
+                    ReadAndPrintAllBooksInConsole();
                     break;
                 case 2:
-                    UserAddNewBook();
+                    AddNewBook();
                     break;
                 case 3:
-                    UserDeleteBook();
+                    DeleteBookById();
                     break;
                 case 4:
-                    UserBorrowBook();
+                    BorrowBook();
                     break;
                 case 5: 
-                    UserReturnBook();
+                    ReturnBook();
                     break;
                 case 6:
-                    UserFindBookByAuthor();
+                    FindBookByAuthor();
                     break;
                 case 7:
-                    UserFindBookByTitle();
+                    FindBookByTitle();
                     break;
                 default:
                     return;
@@ -49,20 +47,29 @@ public class App
         }
     }
 
-    public void UserPrintAllBooks()
+    public void ReadAndPrintAllBooksInConsole()
     {
-        _lib.SetBooksList(_fm.GetBooksListFromFile());
-        ConsolePrintBooksList(_lib.GetBooks());
+        _lib.SetBooksList();
+        PrintBooksListInConsole(_lib.GetBooks());
     }
 
-    public void UserAddNewBook()
+    public void AddNewBook()
     {
-        _lib.SetBooksList(_fm.GetBooksListFromFile());
-        _lib.AddNewBook();
-        _fm.WriteBooksToFile(_lib.GetBooks());
+        _lib.SetBooksList();
+        
+        Console.Write("Book title: ");
+        string title = Console.ReadLine();
+
+        Console.Write("Book author: ");
+        string author = Console.ReadLine();
+
+        Console.Write("Book year: ");
+        int year = int.Parse(Console.ReadLine());
+        
+        _lib.AddNewBook(title, author, year);
     }
 
-    public void UserDeleteBook()
+    public void DeleteBookById()
     {
         Console.WriteLine("Enter book ID to delete or N to cancel");
         var input = Console.ReadLine();
@@ -74,40 +81,82 @@ public class App
 
         if (int.TryParse(input, out int id))
         {
-            _lib.RemoveBookById(id);
+            try
+            {
+                _lib.RemoveBookById(id);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
         else
         {
             Console.WriteLine("Invalid input. Enter a number or N to cancel");
         }
-        _fm.WriteBooksToFile(_lib.GetBooks());
     }
 
-    private void UserFindBookByAuthor()
+    private void FindBookByAuthor()
     {
         Console.WriteLine("Enter the author to find: ");
         var input = Console.ReadLine();
-        ConsolePrintBooksList(_lib.SearchBookByAuthor(input));
+
+        try
+        {
+            var result = _lib.SearchBookByAuthor(input);
+            
+            if (!result.Any())
+            {
+                Console.WriteLine("This author is not found");
+            }
+            else
+            {
+                PrintBooksListInConsole(result);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+
     }
     
-    private void UserFindBookByTitle()
+    private void FindBookByTitle()
     {
         Console.WriteLine("Enter the title to find: ");
         var input = Console.ReadLine();
-        ConsolePrintBooksList(_lib.SearchBookByTitle(input));
+
+        try
+        {
+            var result = _lib.SearchBookByTitle(input);
+            
+            if (!result.Any())
+            {
+                Console.WriteLine("This title is not found");
+            }
+            else
+            {
+                PrintBooksListInConsole(result);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+
     }
 
-    private void MainMenuConsole()
+    private void PrintMainMenuInConsole()
     {
         Console.WriteLine("Choose Operation: \n 1 - Read Library \n 2 - Add new book \n 3 - Delete book \n 4 - Borrow Book \n 5 - Return Book \n 6 - Search by the author \n 7 - Search by the title \n Any button to exit ");
     }
 
-    private int UserMakeChoice()
+    private int MakeChoiceInConsole()
     {
         return Choice = int.Parse(Console.ReadLine());
     }
 
-    private void UserBorrowBook()
+    private void BorrowBook()
     {
         Console.WriteLine("Enter book ID to borrow or N to cancel");
         var input = Console.ReadLine();
@@ -119,17 +168,23 @@ public class App
         
         if (int.TryParse(input, out int id))
         {
-            _lib.BorrowBookById(id);
+            try
+            {
+                _lib.BorrowBookById(id);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            
         }
         else
         {
             Console.WriteLine("Invalid input. Enter a number or N to cancel");
         }
-        
-        _fm.WriteBooksToFile(_lib.GetBooks());
     }
     
-    private void UserReturnBook()
+    private void ReturnBook()
     {
         Console.WriteLine("Enter book ID to return or N to cancel");
         var input = Console.ReadLine();
@@ -141,17 +196,22 @@ public class App
         
         if (int.TryParse(input, out int id))
         {
-            _lib.ReturnBookById(id);
+            try
+            {
+                _lib.ReturnBookById(id);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
         else
         {
             Console.WriteLine("Invalid input. Enter a number or N to cancel");
         }
-        
-        _fm.WriteBooksToFile(_lib.GetBooks());
     }
     
-    private void ConsolePrintBooksList(List<Book> books)
+    private void PrintBooksListInConsole(List<Book> books)
     {
         if (books.Count != 0)
         {

@@ -1,29 +1,29 @@
-﻿using LibraryApp.Models;
+﻿using LibraryApp.Managers;
+using LibraryApp.Models;
 
 namespace LibraryApp;
 
 public class Library
 {
+    private FileManager _fm;
+    
     private int _nextId;
 
     private List<Book> _books = new List<Book>();
 
-    public List<Book> GetBooks()
+    public Library(FileManager fm)
     {
-        return _books;
+        _fm = fm;
+        SetBooksList();
     }
 
-    public void AddNewBook()
+    public List<Book> GetBooks()
     {
-        Console.WriteLine("Book title: "); 
-        string title = Console.ReadLine();
+        return new List<Book>(_books);
+    }
 
-        Console.WriteLine("Book author: ");
-        string author = Console.ReadLine();
-
-        Console.WriteLine("Book year: ");
-        int year = int.Parse(Console.ReadLine());
-
+    public void AddNewBook(string title, string author, int year)
+    {
         if (_books.Count > 0)
         {
             _nextId = _books.Max(b => b.Id) + 1;
@@ -43,28 +43,30 @@ public class Library
         };
 
         _books.Add(newBook);
+        
+        _fm.WriteBooksToFile(_books);
     }
 
     public List<Book> SearchBookByAuthor(string author)
     {
-        var bookToFind = _books.Where(b => b.Author.Contains(author, StringComparison.CurrentCultureIgnoreCase)).ToList();
-        
-        if (!bookToFind.Any()) 
+        if (string.IsNullOrWhiteSpace(author))
         {
-            Console.WriteLine("This author is not found");
+            throw new Exception("Author cannot be empty");
         }
+        
+        var bookToFind = _books.Where(b => b.Author.Contains(author, StringComparison.CurrentCultureIgnoreCase)).ToList();
         
         return bookToFind;
     }
     
     public List<Book> SearchBookByTitle(string title)
     {
-        var bookToFind = _books.Where(b => b.Title.Contains(title, StringComparison.CurrentCultureIgnoreCase)).ToList();
-        
-        if (!bookToFind.Any()) 
+        if (string.IsNullOrWhiteSpace(title))
         {
-            Console.WriteLine("This title is not found");
+            throw new Exception("Title cannot be empty");
         }
+        
+        var bookToFind = _books.Where(b => b.Title.Contains(title, StringComparison.CurrentCultureIgnoreCase)).ToList();
         
         return bookToFind;
     }
@@ -73,40 +75,40 @@ public class Library
     {
         var book = _books.FirstOrDefault(b => b.Id == bookId);
 
-        if (book == null || book.Status == Book.BookStatus.Borrowed)
+        if (book == null)
         {
-            Console.WriteLine($"Book with id {bookId} is borrowed or doesnt exist");
+            throw new Exception("Book with this ID does not exist");
         }
-        else
+        if (book.Status == Book.BookStatus.Borrowed)
         {
-            book.Status = Book.BookStatus.Borrowed;
+            throw new Exception("Book with this ID is already borrowed");
         }
+
+        book.Status = Book.BookStatus.Borrowed;
+        _fm.WriteBooksToFile(GetBooks());
+
     }
 
     public void ReturnBookById(int bookId)
     {
         var book = _books.FirstOrDefault(b => b.Id == bookId);
 
-        if (book == null || book.Status == Book.BookStatus.Available)
+        if (book == null)
         {
-            Console.WriteLine($"Book with id {bookId} is already available");
+            throw new Exception("Book with this ID does not exist");
         }
-        else
+        if (book.Status == Book.BookStatus.Available)
         {
-            book.Status = Book.BookStatus.Available;
+            throw new Exception("Book with this ID is already available");
         }
+
+        book.Status = Book.BookStatus.Available;
+        _fm.WriteBooksToFile(GetBooks());
     }
 
-    public void SetBooksList(List<Book> books)
+    public void SetBooksList()
     {
-        if (books.Count > 0)
-        {
-            _books = books;
-        }
-        else
-        {
-            Console.WriteLine("No books to add to list");
-        }
+        _books = _fm.GetBooksListFromFile();
     }
 
     public void RemoveBookById(int bookId)
@@ -116,10 +118,11 @@ public class Library
         if (bookToDelete != null)
         {
             _books.Remove(bookToDelete);
+            _fm.WriteBooksToFile(_books);
         }
         else
         {
-            Console.WriteLine($"Book with id {bookId} is not found");
+            throw new Exception("Book with this ID does not exist");
         }
     }
 }
