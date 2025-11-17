@@ -31,6 +31,12 @@ artifacts/
 # ASP.NET Scaffolding
 ScaffoldingReadMe.txt
 
+# JetBrains IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+
 # NuGet Packages
 *.nupkg
 # NuGet Symbol Packages
