@@ -16,18 +16,18 @@ public class App
     {
         while (true)
         {
-            PrintMainMenuInConsole();
+            PrintMenu();
     
-            switch (MakeChoiceInConsole())
+            switch (ReadInput())
             {
                 case 1:
-                    ReadAndPrintAllBooksInConsole();
+                    PrintAllBooks();
                     break;
                 case 2:
                     AddNewBook();
                     break;
                 case 3:
-                    DeleteBookById();
+                    DeleteBook();
                     break;
                 case 4:
                     BorrowBook();
@@ -47,16 +47,13 @@ public class App
         }
     }
 
-    public void ReadAndPrintAllBooksInConsole()
+    public void PrintAllBooks()
     {
-        _lib.SetBooksList();
-        PrintBooksListInConsole(_lib.GetBooks());
+        ShowBooks(_lib.GetBooks());
     }
 
     public void AddNewBook()
     {
-        _lib.SetBooksList();
-        
         Console.Write("Book title: ");
         string title = Console.ReadLine();
 
@@ -69,7 +66,7 @@ public class App
         _lib.AddNewBook(title, author, year);
     }
 
-    public void DeleteBookById()
+    public void DeleteBook()
     {
         Console.WriteLine("Enter book ID to delete or N to cancel");
         var input = Console.ReadLine();
@@ -83,7 +80,7 @@ public class App
         {
             try
             {
-                _lib.RemoveBookById(id);
+                _lib.DeleteBook(id);
             }
             catch (Exception ex)
             {
@@ -103,7 +100,7 @@ public class App
 
         try
         {
-            var result = _lib.SearchBookByAuthor(input);
+            var result = _lib.SearchByAuthor(input);
             
             if (!result.Any())
             {
@@ -111,7 +108,7 @@ public class App
             }
             else
             {
-                PrintBooksListInConsole(result);
+                ShowBooks(result);
             }
         }
         catch (Exception ex)
@@ -128,7 +125,7 @@ public class App
 
         try
         {
-            var result = _lib.SearchBookByTitle(input);
+            var result = _lib.SearchByTitle(input);
             
             if (!result.Any())
             {
@@ -136,7 +133,7 @@ public class App
             }
             else
             {
-                PrintBooksListInConsole(result);
+                ShowBooks(result);
             }
         }
         catch (Exception ex)
@@ -146,12 +143,12 @@ public class App
 
     }
 
-    private void PrintMainMenuInConsole()
+    private void PrintMenu()
     {
         Console.WriteLine("Choose Operation: \n 1 - Read Library \n 2 - Add new book \n 3 - Delete book \n 4 - Borrow Book \n 5 - Return Book \n 6 - Search by the author \n 7 - Search by the title \n Any button to exit ");
     }
 
-    private int MakeChoiceInConsole()
+    private int ReadInput()
     {
         return Choice = int.Parse(Console.ReadLine());
     }
@@ -170,7 +167,7 @@ public class App
         {
             try
             {
-                _lib.BorrowBookById(id);
+                _lib.BorrowBook(id);
             }
             catch(Exception ex)
             {
@@ -198,7 +195,7 @@ public class App
         {
             try
             {
-                _lib.ReturnBookById(id);
+                _lib.ReturnBook(id);
             }
             catch (Exception ex)
             {
@@ -211,7 +208,7 @@ public class App
         }
     }
     
-    private void PrintBooksListInConsole(List<Book> books)
+    private void ShowBooks(List<Book> books)
     {
         if (books.Count != 0)
         {

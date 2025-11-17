@@ -47,31 +47,31 @@ public class Library
         _fm.WriteBooksToFile(_books);
     }
 
-    public List<Book> SearchBookByAuthor(string author)
+    public List<Book> SearchByAuthor(string author)
     {
         if (string.IsNullOrWhiteSpace(author))
         {
             throw new Exception("Author cannot be empty");
         }
         
-        var bookToFind = _books.Where(b => b.Author.Contains(author, StringComparison.CurrentCultureIgnoreCase)).ToList();
+        var foundBook = _books.Where(b => b.Author.Contains(author, StringComparison.CurrentCultureIgnoreCase)).ToList();
         
-        return bookToFind;
+        return foundBook;
     }
     
-    public List<Book> SearchBookByTitle(string title)
+    public List<Book> SearchByTitle(string title)
     {
         if (string.IsNullOrWhiteSpace(title))
         {
             throw new Exception("Title cannot be empty");
         }
         
-        var bookToFind = _books.Where(b => b.Title.Contains(title, StringComparison.CurrentCultureIgnoreCase)).ToList();
+        var foundBook = _books.Where(b => b.Title.Contains(title, StringComparison.CurrentCultureIgnoreCase)).ToList();
         
-        return bookToFind;
+        return foundBook;
     }
 
-    public void BorrowBookById(int bookId)
+    public void BorrowBook(int bookId)
     {
         var book = _books.FirstOrDefault(b => b.Id == bookId);
 
@@ -89,7 +89,7 @@ public class Library
 
     }
 
-    public void ReturnBookById(int bookId)
+    public void ReturnBook(int bookId)
     {
         var book = _books.FirstOrDefault(b => b.Id == bookId);
 
@@ -106,12 +106,12 @@ public class Library
         _fm.WriteBooksToFile(GetBooks());
     }
 
-    public void SetBooksList()
+    private void SetBooksList()
     {
         _books = _fm.GetBooksListFromFile();
     }
 
-    public void RemoveBookById(int bookId)
+    public void DeleteBook(int bookId)
     {
         var bookToDelete = _books.FirstOrDefault(b => b.Id == bookId);
 
