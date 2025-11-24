@@ -18,25 +18,22 @@ public class LibraryConcurrencySimulator
 
         for (int i = 0; i < taskCount; i++)
         {
-            tasks[i] = Task.Run(() =>
+            tasks[i] = Task.Run(() => 
+            {
+                int id = rnd.Next(1, _library.GetBooks().Count + 1);
+                int year = rnd.Next(1800, 2026);
+                    
+                try
                 {
-                    lock (_lock)
-                    {
-                        int id = rnd.Next(1, _library.GetBooks().Count + 1);
-                        int year = rnd.Next(1800, 2026);
-                        
-                        try
-                        {
-                            _library.UpdateBook(id, null, null, year);
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(e);
-                        }
-                    }
+                    _library.UpdateBook(id, null, null, year);
                 }
-            );
+                catch (Exception e)
+                {
+                    Console.WriteLine(e); 
+                }
+            });
         }
+        
         await Task.WhenAll(tasks);
     }
 }
