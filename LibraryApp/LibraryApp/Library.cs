@@ -86,8 +86,27 @@ public class Library
 
         book.Status = Book.BookStatus.Borrowed;
         _fm.WriteBooksToFile(GetBooks());
-
     }
+
+    public void UpdateBook(int bookId, string? title, string? author, int? year)
+    {
+        var book = _books.FirstOrDefault(b => b.Id == bookId);
+
+        if (book == null)
+            throw new Exception("Book with this ID does not exist");
+
+        if (title != null)
+            book.Title = title;
+
+        if (author != null)
+            book.Author = author;
+
+        if (year.HasValue)
+            book.Year = year.Value;
+
+        _fm.WriteBooksToFile(GetBooks());
+    }
+
 
     public void ReturnBook(int bookId)
     {
