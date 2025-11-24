@@ -14,14 +14,13 @@ public class LibraryConcurrencySimulator
     public async Task RunUpdateSimulationAsync(int taskCount)
     {
         Task[] tasks = new Task[taskCount];
-        Random rnd = new Random();
 
         for (int i = 0; i < taskCount; i++)
         {
             tasks[i] = Task.Run(() => 
             {
-                int id = rnd.Next(1, _library.GetBooks().Count + 1);
-                int year = rnd.Next(1800, 2026);
+                int id = Random.Shared.Next(1, _library.GetBooks().Count + 1);
+                int year = Random.Shared.Next(1800, 2026);
                     
                 try
                 {
