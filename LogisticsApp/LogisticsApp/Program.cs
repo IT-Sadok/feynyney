@@ -27,6 +27,7 @@ public class Program
         app.UseAuthorization();
         app.MapAuthEndpoints();
         app.MapUserEndpoints();
+        app.MapPackageEndpoints();
         
         app.Run();
     }

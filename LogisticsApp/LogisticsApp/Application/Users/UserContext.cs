@@ -2,11 +2,11 @@
 
 namespace LogisticsApp.Application.Users;
 
-public class CurrentUserService : ICurrentUserService
+public class UserContext : IUserContext
 {
     private readonly IHttpContextAccessor _http;
 
-    public CurrentUserService(IHttpContextAccessor http)
+    public UserContext(IHttpContextAccessor http)
     {
         _http = http;
     }

@@ -10,4 +10,14 @@ public class AppDbContext : IdentityDbContext<User>
     {
         
     }
+    
+    public DbSet<Package> Packages => Set<Package>();
+    public DbSet<Terminal> Terminals => Set<Terminal>();
+    public DbSet<Transport> Transports => Set<Transport>();
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+        builder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+    }
 }

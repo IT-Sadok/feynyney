@@ -1,8 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using LogisticsApp.Models;
-using LogisticsApp.Services;
+using LogisticsApp.DTO;
 using Microsoft.IdentityModel.Tokens;
 
 namespace LogisticsApp.Services;
@@ -16,7 +15,7 @@ public class JwtTokenService : IJwtTokenService
         _config = config;
     }
     
-    public string CreateToken(User user)
+    public string CreateToken(UserTokenModel model)
     {
         var jwt = _config.GetSection("Jwt");
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["Key"]!));
@@ -24,8 +23,9 @@ public class JwtTokenService : IJwtTokenService
 
         var claims = new[]
         {
-            new Claim(ClaimTypes.NameIdentifier, user.Id),
-            new Claim(ClaimTypes.Email, user.Email ?? "")
+            new Claim(ClaimTypes.NameIdentifier, model.Id),
+            new Claim(ClaimTypes.Email, model.Email ?? ""),
+            new Claim(ClaimTypes.Name, model.UserName ?? ""),
         };
 
         var token = new JwtSecurityToken(

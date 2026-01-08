@@ -1,4 +1,5 @@
 ﻿using LogisticsApp.Application.Auth;
+using LogisticsApp.Application.Packages;
 using LogisticsApp.Application.Users;
 
 namespace LogisticsApp.Extensions;
@@ -10,7 +11,9 @@ public static class ApplicationExtensions
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUserProfileService, UserProfileService>();
         services.AddHttpContextAccessor();
-        services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddScoped<IUserContext, UserContext>();
+        services.AddScoped<IPackageService,  PackageService>();
+        services.AddScoped<ITrackingNumberGenerator, TrackingNumberGenerator>();
         
         return services;
     }

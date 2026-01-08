@@ -1,8 +1,9 @@
-﻿using LogisticsApp.Models;
+﻿using LogisticsApp.DTO;
+using LogisticsApp.Models;
 
 namespace LogisticsApp.Services;
 
 public interface IJwtTokenService
 {
-    string CreateToken(User user);
+    string CreateToken(UserTokenModel  model);
 }

@@ -6,10 +6,10 @@ namespace LogisticsApp.Application.Users;
 
 public class UserProfileService : IUserProfileService
 {
-    private readonly ICurrentUserService _current;
+    private readonly IUserContext _current;
     private readonly UserManager<User> _userManager;
 
-    public UserProfileService(ICurrentUserService current,  UserManager<User> userManager)
+    public UserProfileService(IUserContext current,  UserManager<User> userManager)
     {
         _current = current;
         _userManager = userManager;

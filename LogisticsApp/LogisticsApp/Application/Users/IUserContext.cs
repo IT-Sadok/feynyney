@@ -1,6 +1,6 @@
 ﻿namespace LogisticsApp.Application.Users;
 
-public interface ICurrentUserService
+public interface IUserContext
 {
     string UserId { get; }
 }

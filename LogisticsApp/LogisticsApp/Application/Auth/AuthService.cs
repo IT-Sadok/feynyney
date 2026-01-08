@@ -36,6 +36,12 @@ public class AuthService : IAuthService
         if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password))
             throw new UnauthorizedAccessException();
 
-        return _jwt.CreateToken(user);
+        var tokenUser = new UserTokenModel(
+            user.Id,
+            user.Email ?? "",
+            user.UserName ?? ""
+            );
+
+        return _jwt.CreateToken(tokenUser);
     }
 }

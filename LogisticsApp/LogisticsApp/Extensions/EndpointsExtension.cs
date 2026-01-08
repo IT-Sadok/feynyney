@@ -24,7 +24,7 @@ public static class EndpointsExtension
         app.MapPost(Routes.Login, async (IAuthService auth, LoginModel model) =>
         {
              var token = await auth.Login(model);
-             return Results.Ok(new {token});
+             return Results.Ok(new LoginResponseModel(token));
         });
 
         return app;
