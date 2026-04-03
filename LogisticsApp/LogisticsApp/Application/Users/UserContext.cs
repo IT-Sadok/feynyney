@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using LogisticsApp.DTO;
 
 namespace LogisticsApp.Application.Users;
 
@@ -10,10 +11,13 @@ public class UserContext : IUserContext
     {
         _http = http;
     }
-    
-    public string UserId =>
-        _http.HttpContext?
-            .User?
-            .FindFirstValue(ClaimTypes.NameIdentifier)
-        ?? throw new UnauthorizedAccessException();
+
+
+    public UserContextModel User =>
+        new(
+            _http.HttpContext?
+                .User?
+                .FindFirstValue(ClaimTypes.NameIdentifier)
+            ?? throw new UnauthorizedAccessException()
+        );
 }

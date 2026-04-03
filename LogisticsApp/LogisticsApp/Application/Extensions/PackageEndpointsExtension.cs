@@ -1,4 +1,5 @@
-﻿using LogisticsApp.Application.Packages;
+﻿using LogisticsApp.Application;
+using LogisticsApp.Application.Packages;
 using LogisticsApp.DTO;
 using Microsoft.AspNetCore.Authorization;
 
@@ -8,9 +9,9 @@ public static class PackageEndpointsExtension
 {
     public static WebApplication MapPackageEndpoints(this WebApplication app)
     {
-        app.MapPost("/packages", [AuthorizeAttribute] async (IPackageService service, CreatePackageRequestModel requestModel) =>
+        app.MapPost(Routes.Packages, [AuthorizeAttribute] async (IPackageService service, CreatePackageRequestModel requestModel) =>
             {
-               var created = await service.Create(requestModel);
+               var created = await service.CreateAsync(requestModel);
                return Results.Created($"/packages/track/{created.TrackingNumber}", created);
             });
         

@@ -17,7 +17,7 @@ public class UserProfileService : IUserProfileService
     
     public async Task<UserModel> GetMe()
     {
-        var user = await _userManager.FindByIdAsync(_current.UserId);
+        var user = await _userManager.FindByIdAsync(_current.User.UserId);
 
         return new UserModel(user!.Id, user.Email!, user.UserName!);
     }

@@ -1,3 +1,6 @@
+using FluentValidation;
+using LogisticsApp.Application.Validation;
+using LogisticsApp.DTO;
 using LogisticsApp.Extensions;
 
 namespace LogisticsApp;
@@ -13,6 +16,7 @@ public class Program
             .AddJwtAuthentication(builder.Configuration)
             .AddAppIdentity()
             .AddApplication()
+            .AddValidatorsFromAssemblyContaining<PackageModelValidation>()
             .AddAuthorization()
             .AddSwagger();
 

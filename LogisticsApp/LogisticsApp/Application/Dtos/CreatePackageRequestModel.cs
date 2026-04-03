@@ -2,7 +2,7 @@
 
 public record CreatePackageRequestModel(
     string Name,
-    decimal Weight,
+    double Weight,
     string RecipientEmail,
     int OriginTerminalId,
     int DestinationTerminalId,
