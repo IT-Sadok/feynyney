@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogisticsApp", "LogisticsApp\LogisticsApp.csproj", "{8011B07C-925B-4EA4-9383-63C3DCD77369}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8011B07C-925B-4EA4-9383-63C3DCD77369}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8011B07C-925B-4EA4-9383-63C3DCD77369}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8011B07C-925B-4EA4-9383-63C3DCD77369}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8011B07C-925B-4EA4-9383-63C3DCD77369}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
