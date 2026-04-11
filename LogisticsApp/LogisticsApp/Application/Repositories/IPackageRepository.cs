@@ -5,5 +5,8 @@ namespace LogisticsApp.Application.Repositories;
 
 public interface IPackageRepository
 {
-    Task AddAsync(Package package);
+    Task AddPackageAsync(Package package);
+    Task<bool> TerminalExistsAsync(int id);
+    Task<bool> TransportExistsAsync(int id);
+    Task SaveAsync();
 }

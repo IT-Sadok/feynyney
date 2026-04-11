@@ -15,8 +15,6 @@ public static class ApplicationExtensions
         services.AddScoped<IUserContext, UserContext>();
         services.AddScoped<IPackageService,  PackageService>();
         services.AddScoped<ITrackingNumberGenerator, TrackingNumberGenerator>();
-        services.AddScoped<ITerminalRepository, TerminalRepository>();
-        services.AddScoped<ITransportRepository, TransportRepository>();
         services.AddScoped<IPackageRepository, PackageRepository>();
         
         return services;

@@ -29,9 +29,7 @@ public class AuthService : IAuthService
     public async Task Register(RegisterModel model)
     {
         //validation
-        var validation = await _registerValidator.ValidateAsync(model);
-        if(!validation.IsValid)
-            throw new ValidationException(validation.Errors);
+        await _registerValidator.ValidateAndThrowAsync(model);
         
         var user = new User
         {
@@ -47,9 +45,7 @@ public class AuthService : IAuthService
 
     public async Task<string> Login(LoginModel model)
     {
-        var validation =  await _loginValidator.ValidateAsync(model);
-        if(!validation.IsValid)
-            throw new ValidationException(validation.Errors);
+        await _loginValidator.ValidateAndThrowAsync(model);
         
         var user = await _userManager.FindByEmailAsync(model.Email);
         

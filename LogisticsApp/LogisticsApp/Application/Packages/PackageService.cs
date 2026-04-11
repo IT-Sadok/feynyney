@@ -11,41 +11,30 @@ namespace LogisticsApp.Application.Packages;
 
 public class PackageService : IPackageService
 {
-    private readonly AppDbContext _dbContext;
     private readonly UserManager<User> _userManager;
     private readonly IUserContext _currentUser;
     private readonly IValidator<CreatePackageRequestModel> _validator;
     private readonly ITrackingNumberGenerator _tracking;
-    private readonly ITerminalRepository _terminalRepository;
-    private readonly ITransportRepository _transportRepository;
     private readonly IPackageRepository _packageRepository;
 
     public PackageService(
-        AppDbContext dbContext,
         UserManager<User> userManager,
         IUserContext currentUser,
         IValidator<CreatePackageRequestModel> validator,
         ITrackingNumberGenerator tracking,
-        ITerminalRepository terminalRepository,
-        ITransportRepository transportRepository,
         IPackageRepository packageRepository)
     {
-        _dbContext = dbContext;
         _userManager = userManager;
         _currentUser = currentUser;
         _validator = validator;
         _tracking = tracking;
-        _terminalRepository = terminalRepository;
-        _transportRepository = transportRepository;
         _packageRepository = packageRepository;
     }
     
     public async Task<PackageResponseModel> CreateAsync(CreatePackageRequestModel requestModel)
     {
         // basic validation
-        var validationResult =  await _validator.ValidateAsync(requestModel);
-        if(!validationResult.IsValid)
-            throw new ValidationException(validationResult.Errors);
+        await _validator.ValidateAndThrowAsync(requestModel);
 
         // current user is a sender
         var sender = _currentUser.User;
@@ -56,16 +45,16 @@ public class PackageService : IPackageService
             throw new ArgumentException("Recipient not found");
         
         // terminal validation
-        if(!await _terminalRepository.ExistsAsync(requestModel.OriginTerminalId))
+        if(!await _packageRepository.TerminalExistsAsync(requestModel.OriginTerminalId))
             throw new ArgumentException("Origin terminal not found");
         
-        if(!await _terminalRepository.ExistsAsync(requestModel.DestinationTerminalId))
+        if(!await _packageRepository.TerminalExistsAsync(requestModel.DestinationTerminalId))
             throw new ArgumentException("Destination terminal not found");
         
         // transport validation
         if (requestModel.TransportId is not null)
         {
-            if(!await _transportRepository.ExistsAsync(requestModel.TransportId.Value))
+            if(!await _packageRepository.TransportExistsAsync(requestModel.TransportId.Value))
                 throw new ArgumentException("Transport not found");
         }
         
@@ -83,9 +72,9 @@ public class PackageService : IPackageService
             );
         
         // save
-        await _packageRepository.AddAsync(package);
+        await _packageRepository.AddPackageAsync(package);
 
-        await _dbContext.SaveChangesAsync();
+        await _packageRepository.SaveAsync();
         
         // response
         return new PackageResponseModel(
