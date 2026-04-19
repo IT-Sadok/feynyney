@@ -23,6 +23,14 @@ public static class PackageEndpointsExtension
             return Results.Ok(await packageService.GetMyPackagesAsync(ct));
         });
         
+        app.MapGet(Routes.PackageNumber, async (
+            IPackageService packageService,
+            string trackingNumber,
+            CancellationToken ct) =>
+        {
+            return Results.Ok(await packageService.GetPackageByTrackingNumberAsync(trackingNumber, ct));
+        });
+        
         return app;
     }
     

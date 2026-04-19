@@ -91,9 +91,21 @@ public class PackageService : IPackageService
         var currentUser = _currentUser.User;
         
         var packages = await _packageRepository.GetPackagesByRecipientIdAsync(currentUser.UserId, ct);
-
+        
         return packages.
             Select(x => x.ToPackageResponseModel())
             .ToList();
+    }
+
+    public async Task<PackageResponseModel> GetPackageByTrackingNumberAsync(string trackingNumber, CancellationToken ct)
+    {
+        var package = await _packageRepository.GetPackageByTrackingNumberAsync(trackingNumber, ct);
+
+        if (package is null)
+        {
+            throw new ArgumentException("Package not found");
+        }
+        
+        return package.ToPackageResponseModel();
     }
 }

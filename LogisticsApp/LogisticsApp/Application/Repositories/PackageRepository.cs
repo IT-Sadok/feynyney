@@ -39,4 +39,9 @@ public class PackageRepository : IPackageRepository
     {
         return _dbContext.Packages.Where(p => p.RecipientUserId == userId).ToListAsync(ct); 
     }
+
+    public Task<Package?> GetPackageByTrackingNumberAsync(string trackingNumber, CancellationToken ct)
+    {
+        return _dbContext.Packages.FirstOrDefaultAsync(p => p.TrackingNumber == trackingNumber, ct);
+    }
 }

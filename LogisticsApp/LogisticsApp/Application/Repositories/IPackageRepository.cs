@@ -10,4 +10,5 @@ public interface IPackageRepository
     Task<bool> TransportExistsAsync(int id, CancellationToken ct);
     Task SaveAsync(CancellationToken ct);
     Task<List<Package>> GetPackagesByRecipientIdAsync(string userId, CancellationToken ct);
+    Task<Package?> GetPackageByTrackingNumberAsync(string trackingNumber, CancellationToken ct);
 }
