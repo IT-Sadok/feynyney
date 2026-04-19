@@ -4,5 +4,5 @@ namespace LogisticsApp.Application.Packages;
 
 public interface IPackageService
 {
-    Task<PackageResponseModel> Create(CreatePackageRequestModel req);
+    Task<PackageResponseModel> CreateAsync(CreatePackageRequestModel req);
 }

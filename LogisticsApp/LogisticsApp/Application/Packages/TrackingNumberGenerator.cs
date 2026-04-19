@@ -2,7 +2,7 @@
 
 public class TrackingNumberGenerator : ITrackingNumberGenerator
 {
-    public string New()
+    public string GenerateTrackingNumber()
     {
         return $"PKG {Guid.NewGuid():N}";
     }

@@ -4,16 +4,16 @@ public class Package
 {
     public int Id { get; set; }
 
-    public string Name { get; set; } = "";
-    public decimal Weight { get; set; }
+    public string Name { get; set; } = String.Empty;
+    public double Weight { get; set; }
 
-    public string TrackingNumber { get; set; } = "";
+    public string TrackingNumber { get; set; } = String.Empty;
 
     // Users (Identity)
-    public string SenderUserId { get; set; } = "";
+    public string SenderUserId { get; set; } = String.Empty;
     public User SenderUser { get; set; } = null!;
 
-    public string RecipientUserId { get; set; } = "";
+    public string RecipientUserId { get; set; } = String.Empty;
     public User RecipientUser { get; set; } = null!;
 
     // Terminals

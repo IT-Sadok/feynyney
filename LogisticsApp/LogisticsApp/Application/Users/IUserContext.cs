@@ -1,6 +1,8 @@
-﻿namespace LogisticsApp.Application.Users;
+﻿using LogisticsApp.DTO;
+
+namespace LogisticsApp.Application.Users;
 
 public interface IUserContext
 {
-    string UserId { get; }
+    public UserContextModel User { get; }
 }

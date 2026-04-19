@@ -1,4 +1,6 @@
-﻿using LogisticsApp.DTO;
+﻿using FluentValidation;
+using LogisticsApp.Application.Validation;
+using LogisticsApp.DTO;
 using LogisticsApp.Models;
 using LogisticsApp.Services;
 using Microsoft.AspNetCore.Identity;
@@ -9,15 +11,26 @@ public class AuthService : IAuthService
 {
     private readonly UserManager<User> _userManager;
     private readonly IJwtTokenService _jwt;
+    private readonly IValidator<RegisterModel> _registerValidator;
+    private readonly IValidator<LoginModel> _loginValidator;
 
-    public AuthService(UserManager<User> userManager,  IJwtTokenService jwt)
+    public AuthService(
+        UserManager<User> userManager,
+        IJwtTokenService jwt,
+        IValidator<RegisterModel> registerValidator,
+        IValidator<LoginModel> loginValidator)
     {
         _userManager = userManager;
         _jwt = jwt;
+        _registerValidator = registerValidator;
+        _loginValidator = loginValidator;
     }
     
     public async Task Register(RegisterModel model)
     {
+        //validation
+        await _registerValidator.ValidateAndThrowAsync(model);
+        
         var user = new User
         {
             UserName = model.Email,
@@ -32,7 +45,10 @@ public class AuthService : IAuthService
 
     public async Task<string> Login(LoginModel model)
     {
+        await _loginValidator.ValidateAndThrowAsync(model);
+        
         var user = await _userManager.FindByEmailAsync(model.Email);
+        
         if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password))
             throw new UnauthorizedAccessException();
 

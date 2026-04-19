@@ -1,13 +1,8 @@
-﻿using System.Security.Claims;
-using LogisticsApp.Application;
+﻿using LogisticsApp.Application;
 using LogisticsApp.Application.Auth;
 using LogisticsApp.Application.Users;
 using LogisticsApp.DTO;
-using LogisticsApp.Models;
-using LogisticsApp.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace LogisticsApp.Extensions;
 

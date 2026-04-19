@@ -2,5 +2,5 @@
 
 public interface ITrackingNumberGenerator
 {
-    string New();
+    string GenerateTrackingNumber();
 }
