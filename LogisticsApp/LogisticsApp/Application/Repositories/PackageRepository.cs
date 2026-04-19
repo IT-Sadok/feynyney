@@ -1,4 +1,6 @@
-﻿using LogisticsApp.Data;
+﻿using LogisticsApp.Application.Users;
+using LogisticsApp.Data;
+using LogisticsApp.DTO;
 using LogisticsApp.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,23 +15,28 @@ public class PackageRepository : IPackageRepository
         _dbContext = dbContext;
     }
 
-    public async Task AddPackageAsync(Package package)
+    public async Task AddPackageAsync(Package package, CancellationToken ct)
     {
-        await _dbContext.Packages.AddAsync(package);
+        await _dbContext.Packages.AddAsync(package, ct);
     }
     
-    public async Task<bool> TerminalExistsAsync(int id)
+    public async Task<bool> TerminalExistsAsync(int id, CancellationToken ct)
     {
-        return await _dbContext.Terminals.AnyAsync(t => t.Id == id);
+        return await _dbContext.Terminals.AnyAsync(t => t.Id == id, ct);
     }
     
-    public async Task<bool> TransportExistsAsync(int id)
+    public async Task<bool> TransportExistsAsync(int id, CancellationToken ct)
     {
-        return await _dbContext.Transports.AnyAsync(t => t.Id == id);
+        return await _dbContext.Transports.AnyAsync(t => t.Id == id, ct);
     }
 
-    public Task SaveAsync()
+    public Task SaveAsync(CancellationToken ct)
     {
-        return _dbContext.SaveChangesAsync();
+        return _dbContext.SaveChangesAsync(ct);
+    }
+
+    public Task<List<Package>> GetPackagesByRecipientIdAsync(string userId, CancellationToken ct)
+    {
+        return _dbContext.Packages.Where(p => p.RecipientUserId == userId).ToListAsync(ct); 
     }
 }

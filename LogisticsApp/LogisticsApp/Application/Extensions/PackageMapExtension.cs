@@ -32,4 +32,14 @@ public static class PackageMapExtension
             DeliveredAt = null
         };
     }
+
+    public static PackageResponseModel ToPackageResponseModel(this Package package)
+    {
+        return new PackageResponseModel(
+            package.Name,
+            package.Id,
+            package.TrackingNumber,
+            package.Status,
+            package.SentAt);
+    }
 }

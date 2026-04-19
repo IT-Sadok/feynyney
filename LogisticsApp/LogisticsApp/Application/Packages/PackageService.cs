@@ -31,10 +31,10 @@ public class PackageService : IPackageService
         _packageRepository = packageRepository;
     }
     
-    public async Task<PackageResponseModel> CreateAsync(CreatePackageRequestModel requestModel)
+    public async Task<PackageResponseModel> CreateAsync(CreatePackageRequestModel requestModel, CancellationToken ct)
     {
         // basic validation
-        await _validator.ValidateAndThrowAsync(requestModel);
+        await _validator.ValidateAndThrowAsync(requestModel, cancellationToken: ct);
 
         // current user is a sender
         var sender = _currentUser.User;
@@ -45,16 +45,16 @@ public class PackageService : IPackageService
             throw new ArgumentException("Recipient not found");
         
         // terminal validation
-        if(!await _packageRepository.TerminalExistsAsync(requestModel.OriginTerminalId))
+        if(!await _packageRepository.TerminalExistsAsync(requestModel.OriginTerminalId, ct))
             throw new ArgumentException("Origin terminal not found");
         
-        if(!await _packageRepository.TerminalExistsAsync(requestModel.DestinationTerminalId))
+        if(!await _packageRepository.TerminalExistsAsync(requestModel.DestinationTerminalId, ct))
             throw new ArgumentException("Destination terminal not found");
         
         // transport validation
         if (requestModel.TransportId is not null)
         {
-            if(!await _packageRepository.TransportExistsAsync(requestModel.TransportId.Value))
+            if(!await _packageRepository.TransportExistsAsync(requestModel.TransportId.Value, ct))
                 throw new ArgumentException("Transport not found");
         }
         
@@ -72,16 +72,28 @@ public class PackageService : IPackageService
             );
         
         // save
-        await _packageRepository.AddPackageAsync(package);
+        await _packageRepository.AddPackageAsync(package, ct);
 
-        await _packageRepository.SaveAsync();
+        await _packageRepository.SaveAsync(ct);
         
         // response
         return new PackageResponseModel(
+            package.Name,
             package.Id,
             package.TrackingNumber,
             package.Status,
             package.SentAt
         );
+    }
+
+    public async Task<List<PackageResponseModel>> GetMyPackagesAsync(CancellationToken ct)
+    {
+        var currentUser = _currentUser.User;
+        
+        var packages = await _packageRepository.GetPackagesByRecipientIdAsync(currentUser.UserId, ct);
+
+        return packages.
+            Select(x => x.ToPackageResponseModel())
+            .ToList();
     }
 }
