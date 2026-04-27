@@ -1,4 +1,5 @@
-﻿using LogisticsApp.Application.Repositories;
+﻿using FluentValidation;
+using LogisticsApp.Application.Repositories;
 using LogisticsApp.DTO;
 using LogisticsApp.Models;
 
@@ -6,15 +7,21 @@ namespace LogisticsApp.Application.Terminals;
 
 public class TerminalService : ITerminalService
 {
-    private ITerminalRepository _terminalRepository;
+    private readonly ITerminalRepository _terminalRepository;
+    private readonly IValidator<CreateTerminalRequestModel> _validator;
 
-    public TerminalService(ITerminalRepository terminalRepository)
+    public TerminalService(
+        ITerminalRepository terminalRepository,
+        IValidator<CreateTerminalRequestModel> validator)
     {
         _terminalRepository = terminalRepository;
+        _validator = validator;
     }
 
     public async Task<TerminalResponseModel> CreateTerminalAsync(CreateTerminalRequestModel requestModel, CancellationToken ct)
     {
+        await _validator.ValidateAndThrowAsync(requestModel, ct);
+        
         var terminal = new Terminal
         {
             Number = requestModel.Number,

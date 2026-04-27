@@ -1,4 +1,5 @@
-﻿using LogisticsApp.Application.Repositories;
+﻿using FluentValidation;
+using LogisticsApp.Application.Repositories;
 using LogisticsApp.DTO;
 using LogisticsApp.Models;
 using Microsoft.EntityFrameworkCore;
@@ -7,15 +8,21 @@ namespace LogisticsApp.Application.Transports;
 
 public class TransportService : ITransportService
 {
-    private ITransportRepository _transportRepository;
+    private readonly ITransportRepository _transportRepository;
+    private readonly IValidator<CreateTransportRequestModel> _validator;
 
-    public TransportService(ITransportRepository transportRepository)
+    public TransportService(
+        ITransportRepository transportRepository,
+        IValidator<CreateTransportRequestModel> validator)
     {
         _transportRepository = transportRepository;
+        _validator = validator;
     }
 
     public async Task<TransportResponseModel> CreateTransportAsync(CreateTransportRequestModel requestModel,CancellationToken ct)
     {
+        await _validator.ValidateAndThrowAsync(requestModel, ct);
+        
         var transport = new Transport
         {
             Type = requestModel.TransportType,

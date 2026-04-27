@@ -41,7 +41,7 @@ public class PackageService : IPackageService
     public async Task<PackageResponseModel> CreateAsync(CreatePackageRequestModel requestModel, CancellationToken ct)
     {
         // basic validation
-        await _validator.ValidateAndThrowAsync(requestModel, cancellationToken: ct);
+        await _validator.ValidateAndThrowAsync(requestModel, ct);
 
         // current user is a sender
         var sender = _currentUser.User;
