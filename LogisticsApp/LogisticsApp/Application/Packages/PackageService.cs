@@ -119,4 +119,43 @@ public class PackageService : IPackageService
         
         return package.ToPackageResponseModel();
     }
+
+    public async Task ReceivePackageAsync(List<int> ids ,CancellationToken ct)
+    {
+        var currentUser = _currentUser.User;
+        
+        var packages = await _packageRepository.GetPackagesByIdsAsync(ids, ct);
+
+        if (packages.Count == ids.Count)
+        {
+            foreach (var package in packages)
+            {
+                if (package.RecipientUserId != currentUser.UserId)
+                {
+                    throw new ArgumentException("Package does not belong to this user!");
+                }
+            
+                switch (package.Status) 
+                {
+                    case PackageStatus.Received:
+                        throw new ArgumentException("Package is already received!");
+                
+                    // case PackageStatus.Sent: //TODO Make admin approve package status to "In Transit"
+                    case PackageStatus.InTransit:
+                        throw new ArgumentException("Package is not delivered yet!");
+                }
+            }
+
+            foreach (var package in packages)
+            {
+                package.Status = PackageStatus.Received;
+            }
+        }
+        else
+        {
+            throw new ArgumentException("Some packages were not found!");
+        }
+        
+        await _packageRepository.SaveAsync(ct);
+    }
 }

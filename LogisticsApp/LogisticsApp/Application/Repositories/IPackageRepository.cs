@@ -12,4 +12,5 @@ public interface IPackageRepository
     Task<List<Package>> GetIncomingPackagesAsync(string userId, CancellationToken ct);
     Task<List<Package>> GetSentPackagesAsync(string userId, CancellationToken ct);
     Task<Package?> GetPackageByTrackingNumberAsync(string trackingNumber, CancellationToken ct);
+    Task<List<Package>> GetPackagesByIdsAsync(List<int> ids, CancellationToken ct);
 }

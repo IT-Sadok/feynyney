@@ -2,6 +2,7 @@
 using LogisticsApp.Application.Packages;
 using LogisticsApp.DTO;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace LogisticsApp.Extensions;
 
@@ -34,6 +35,15 @@ public static class PackageEndpointsExtension
             CancellationToken ct) =>
         {
             return Results.Ok(await packageService.GetPackageByTrackingNumberAsync(trackingNumber, ct));
+        });
+        
+        app.MapPatch(Routes.ReceivePackages, async (
+            IPackageService packageService,
+            List<int> ids,
+            CancellationToken ct) =>
+        {
+            await packageService.ReceivePackageAsync(ids, ct);
+            return Results.Ok("Package received!");
         });
         
         return app;
