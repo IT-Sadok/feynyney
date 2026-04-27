@@ -18,9 +18,14 @@ public static class PackageEndpointsExtension
                return Results.Created($"/packages/track/{created.TrackingNumber}", created);
             });
         
-        app.MapGet(Routes.MyPackages, [Authorize] async (IPackageService packageService, CancellationToken ct) =>
+        app.MapGet(Routes.MyIncomingPackages, [Authorize] async (IPackageService packageService, CancellationToken ct) =>
         {
-            return Results.Ok(await packageService.GetMyPackagesAsync(ct));
+            return Results.Ok(await packageService.GetMyIncomingPackagesAsync(ct));
+        });
+        
+        app.MapGet(Routes.MySentPackages, [Authorize] async (IPackageService packageService, CancellationToken ct) =>
+        {
+            return Results.Ok(await packageService.GetMySentPackagesAsync(ct));
         });
         
         app.MapGet(Routes.PackageNumber, async (

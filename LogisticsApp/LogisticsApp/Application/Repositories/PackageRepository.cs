@@ -35,9 +35,14 @@ public class PackageRepository : IPackageRepository
         return _dbContext.SaveChangesAsync(ct);
     }
 
-    public Task<List<Package>> GetPackagesByRecipientIdAsync(string userId, CancellationToken ct)
+    public Task<List<Package>> GetIncomingPackagesAsync(string userId, CancellationToken ct)
     {
         return _dbContext.Packages.Where(p => p.RecipientUserId == userId).ToListAsync(ct); 
+    }
+    
+    public Task<List<Package>> GetSentPackagesAsync(string userId, CancellationToken ct)
+    {
+        return _dbContext.Packages.Where(p => p.SenderUserId == userId).ToListAsync(ct); 
     }
 
     public Task<Package?> GetPackageByTrackingNumberAsync(string trackingNumber, CancellationToken ct)

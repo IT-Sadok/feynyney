@@ -86,11 +86,22 @@ public class PackageService : IPackageService
         );
     }
 
-    public async Task<List<PackageResponseModel>> GetMyPackagesAsync(CancellationToken ct)
+    public async Task<List<PackageResponseModel>> GetMyIncomingPackagesAsync(CancellationToken ct)
     {
         var currentUser = _currentUser.User;
         
-        var packages = await _packageRepository.GetPackagesByRecipientIdAsync(currentUser.UserId, ct);
+        var packages = await _packageRepository.GetIncomingPackagesAsync(currentUser.UserId, ct);
+        
+        return packages.
+            Select(x => x.ToPackageResponseModel())
+            .ToList();
+    }
+    
+    public async Task<List<PackageResponseModel>> GetMySentPackagesAsync(CancellationToken ct)
+    {
+        var currentUser = _currentUser.User;
+        
+        var packages = await _packageRepository.GetSentPackagesAsync(currentUser.UserId, ct);
         
         return packages.
             Select(x => x.ToPackageResponseModel())
