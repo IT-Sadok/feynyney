@@ -26,10 +26,10 @@ public class AuthService : IAuthService
         _loginValidator = loginValidator;
     }
     
-    public async Task Register(RegisterModel model)
+    public async Task Register(RegisterModel model, CancellationToken ct)
     {
         //validation
-        await _registerValidator.ValidateAndThrowAsync(model);
+        await _registerValidator.ValidateAndThrowAsync(model, cancellationToken: ct);
         
         var user = new User
         {
@@ -43,9 +43,9 @@ public class AuthService : IAuthService
             throw new ApplicationException("User creation failed");
     }
 
-    public async Task<string> Login(LoginModel model)
+    public async Task<string> Login(LoginModel model, CancellationToken ct)
     {
-        await _loginValidator.ValidateAndThrowAsync(model);
+        await _loginValidator.ValidateAndThrowAsync(model, ct);
         
         var user = await _userManager.FindByEmailAsync(model.Email);
         

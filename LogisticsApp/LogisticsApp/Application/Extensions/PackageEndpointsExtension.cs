@@ -9,12 +9,30 @@ public static class PackageEndpointsExtension
 {
     public static WebApplication MapPackageEndpoints(this WebApplication app)
     {
-        app.MapPost(Routes.Packages, [AuthorizeAttribute] async (IPackageService service, CreatePackageRequestModel requestModel) =>
+        app.MapPost(Routes.Packages, [AuthorizeAttribute] async (
+            IPackageService service,
+            CreatePackageRequestModel requestModel,
+            CancellationToken ct) =>
             {
-               var created = await service.CreateAsync(requestModel);
+               var created = await service.CreateAsync(requestModel, ct);
                return Results.Created($"/packages/track/{created.TrackingNumber}", created);
             });
         
+        app.MapGet(Routes.MyPackages, [Authorize] async (IPackageService packageService, CancellationToken ct) =>
+        {
+            return Results.Ok(await packageService.GetMyPackagesAsync(ct));
+        });
+        
+        app.MapGet(Routes.PackageNumber, async (
+            IPackageService packageService,
+            string trackingNumber,
+            CancellationToken ct) =>
+        {
+            return Results.Ok(await packageService.GetPackageByTrackingNumberAsync(trackingNumber, ct));
+        });
+        
         return app;
     }
+    
+    
 }

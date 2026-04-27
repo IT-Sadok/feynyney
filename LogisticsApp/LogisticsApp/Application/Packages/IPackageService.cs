@@ -4,5 +4,7 @@ namespace LogisticsApp.Application.Packages;
 
 public interface IPackageService
 {
-    Task<PackageResponseModel> CreateAsync(CreatePackageRequestModel req);
+    Task<PackageResponseModel> CreateAsync(CreatePackageRequestModel req, CancellationToken ct);
+    Task<List<PackageResponseModel>> GetMyPackagesAsync(CancellationToken ct);
+    Task<PackageResponseModel> GetPackageByTrackingNumberAsync(string trackingNumber, CancellationToken ct);
 }

@@ -4,5 +4,5 @@ namespace LogisticsApp.Application.Users;
 
 public interface IUserProfileService
 {
-    Task<UserModel> GetMe();
+    Task<UserModel> GetMe(CancellationToken ct);
 }

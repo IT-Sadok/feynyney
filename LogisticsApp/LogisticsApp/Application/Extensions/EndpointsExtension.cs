@@ -1,5 +1,6 @@
 ﻿using LogisticsApp.Application;
 using LogisticsApp.Application.Auth;
+using LogisticsApp.Application.Packages;
 using LogisticsApp.Application.Users;
 using LogisticsApp.DTO;
 using Microsoft.AspNetCore.Authorization;
@@ -10,15 +11,21 @@ public static class EndpointsExtension
 {
     public static WebApplication MapAuthEndpoints(this WebApplication app)
     {
-        app.MapPost(Routes.Register, async (IAuthService auth, RegisterModel model) =>
+        app.MapPost(Routes.Register, async (
+            IAuthService auth,
+            RegisterModel model,
+            CancellationToken ct) =>
         {
-            await auth.Register(model);
+            await auth.Register(model, ct);
             return Results.Ok();
         });
         
-        app.MapPost(Routes.Login, async (IAuthService auth, LoginModel model) =>
+        app.MapPost(Routes.Login, async (
+            IAuthService auth,
+            LoginModel model,
+            CancellationToken ct) =>
         {
-             var token = await auth.Login(model);
+             var token = await auth.Login(model, ct);
              return Results.Ok(new LoginResponseModel(token));
         });
 
@@ -28,9 +35,10 @@ public static class EndpointsExtension
     public static WebApplication MapUserEndpoints(this WebApplication app)
     {
         app.MapGet(Routes.Me, [Authorize] async (
-            IUserProfileService profile) =>
+            IUserProfileService profile,
+            CancellationToken ct) =>
         {
-            return Results.Ok(await profile.GetMe());
+            return Results.Ok(await profile.GetMe(ct));
         });
         
         return app;

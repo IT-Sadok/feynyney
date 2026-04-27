@@ -15,7 +15,7 @@ public class UserProfileService : IUserProfileService
         _userManager = userManager;
     }
     
-    public async Task<UserModel> GetMe()
+    public async Task<UserModel> GetMe(CancellationToken ct)
     {
         var user = await _userManager.FindByIdAsync(_current.User.UserId);
 
