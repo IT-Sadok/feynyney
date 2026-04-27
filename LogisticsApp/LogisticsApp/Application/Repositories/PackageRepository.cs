@@ -19,16 +19,6 @@ public class PackageRepository : IPackageRepository
     {
         await _dbContext.Packages.AddAsync(package, ct);
     }
-    
-    public async Task<bool> TerminalExistsAsync(int id, CancellationToken ct)
-    {
-        return await _dbContext.Terminals.AnyAsync(t => t.Id == id, ct);
-    }
-    
-    public async Task<bool> TransportExistsAsync(int id, CancellationToken ct)
-    {
-        return await _dbContext.Transports.AnyAsync(t => t.Id == id, ct);
-    }
 
     public Task SaveAsync(CancellationToken ct)
     {

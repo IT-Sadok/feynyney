@@ -32,6 +32,8 @@ public class Program
         app.MapAuthEndpoints();
         app.MapUserEndpoints();
         app.MapPackageEndpoints();
+        app.MapTransportEndpoints();
+        app.MapTerminalsEndpoints();
         
         app.Run();
     }

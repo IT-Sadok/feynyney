@@ -10,7 +10,7 @@ public static class PackageEndpointsExtension
 {
     public static WebApplication MapPackageEndpoints(this WebApplication app)
     {
-        app.MapPost(Routes.Packages, [AuthorizeAttribute] async (
+        app.MapPost(Routes.Packages, [Authorize] async (
             IPackageService service,
             CreatePackageRequestModel requestModel,
             CancellationToken ct) =>
@@ -37,7 +37,7 @@ public static class PackageEndpointsExtension
             return Results.Ok(await packageService.GetPackageByTrackingNumberAsync(trackingNumber, ct));
         });
         
-        app.MapPatch(Routes.ReceivePackages, async (
+        app.MapPatch(Routes.ReceivePackages, [Authorize] async (
             IPackageService packageService,
             List<int> ids,
             CancellationToken ct) =>
