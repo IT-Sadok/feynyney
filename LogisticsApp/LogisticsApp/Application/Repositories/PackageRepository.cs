@@ -25,6 +25,14 @@ public class PackageRepository : IPackageRepository
         return _dbContext.SaveChangesAsync(ct);
     }
 
+    public Task<List<Package>> GetAllPackagesAsync(CancellationToken ct)
+    {
+        return _dbContext.Packages
+            .Include(x => x.SenderUser)
+            .Include(x=> x.RecipientUser)
+            .ToListAsync(ct);
+    }
+
     public Task<List<Package>> GetIncomingPackagesAsync(string userId, CancellationToken ct)
     {
         return _dbContext.Packages.Where(p => p.RecipientUserId == userId).ToListAsync(ct); 

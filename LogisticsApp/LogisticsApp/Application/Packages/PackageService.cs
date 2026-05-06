@@ -93,14 +93,23 @@ public class PackageService : IPackageService
         );
     }
 
+    public async Task<List<PackageDetailedResponseModel>> GetAllPackagesAsync(CancellationToken ct)
+    {
+        var packages  = await _packageRepository.GetAllPackagesAsync(ct);
+        
+        return packages
+            .Select(x => x.ToPackageDetailedResponseModel())
+            .ToList();
+    }
+
     public async Task<List<PackageResponseModel>> GetMyIncomingPackagesAsync(CancellationToken ct)
     {
         var currentUser = _currentUser.User;
         
         var packages = await _packageRepository.GetIncomingPackagesAsync(currentUser.UserId, ct);
         
-        return packages.
-            Select(x => x.ToPackageResponseModel())
+        return packages
+            .Select(x => x.ToPackageResponseModel())
             .ToList();
     }
     
@@ -127,21 +136,16 @@ public class PackageService : IPackageService
         return package.ToPackageResponseModel();
     }
 
-    public async Task ReceivePackageAsync(List<int> ids ,CancellationToken ct)
+    public async Task ReceivePackageAsync(ReceivePackageRequestModel requestModel ,CancellationToken ct)
     {
         var currentUser = _currentUser.User;
         
-        var packages = await _packageRepository.GetPackagesByIdsAsync(ids, ct);
+        var packages = await _packageRepository.GetPackagesByIdsAsync(requestModel.Ids, ct);
 
-        if (packages.Count == ids.Count)
+        if (packages.Count == requestModel.Ids.Count)
         {
             foreach (var package in packages)
             {
-                if (package.RecipientUserId != currentUser.UserId)
-                {
-                    throw new ArgumentException("Package does not belong to this user!");
-                }
-            
                 switch (package.Status) 
                 {
                     case PackageStatus.Received:
@@ -151,10 +155,7 @@ public class PackageService : IPackageService
                     case PackageStatus.InTransit:
                         throw new ArgumentException("Package is not delivered yet!");
                 }
-            }
-
-            foreach (var package in packages)
-            {
+                
                 package.Status = PackageStatus.Received;
             }
         }

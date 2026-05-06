@@ -2,10 +2,11 @@
 
 namespace LogisticsApp.DTO;
 
-public record PackageResponseModel(
+public record PackageDetailedResponseModel(
     string PackageName,
     int Id,
+    string SenderEmail,
+    string RecipientEmail,
     string TrackingNumber,
     PackageStatus Status,
-    DateTime SentAt
-);
+    DateTime SentAt);

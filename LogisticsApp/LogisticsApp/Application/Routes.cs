@@ -12,6 +12,7 @@ public class Routes
     
     //packages
     public const string Packages = "/packages";
+    public const string AllPackages = "/packages/all";
     public const string MyIncomingPackages = "/packages/my/incoming";
     public const string MySentPackages = "/packages/my/sent";
     public const string PackageNumber = "/packages/track/{trackingNumber}";

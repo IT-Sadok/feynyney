@@ -10,7 +10,7 @@ public static class TransportEndpointsExtension
 {
     public static WebApplication MapTransportEndpoints(this WebApplication app)
     {
-        app.MapPost(Routes.Transports, async (
+        app.MapPost(Routes.Transports,[Authorize(Roles = "Admin")] async (
             ITransportService service,
             CreateTransportRequestModel requestModel,
             CancellationToken ct) =>

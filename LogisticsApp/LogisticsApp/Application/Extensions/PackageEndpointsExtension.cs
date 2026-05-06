@@ -37,12 +37,19 @@ public static class PackageEndpointsExtension
             return Results.Ok(await packageService.GetPackageByTrackingNumberAsync(trackingNumber, ct));
         });
         
-        app.MapPatch(Routes.ReceivePackages, [Authorize] async (
+        app.MapGet(Routes.AllPackages, [Authorize(Roles = "Admin")] async (
             IPackageService packageService,
-            List<int> ids,
             CancellationToken ct) =>
         {
-            await packageService.ReceivePackageAsync(ids, ct);
+            return Results.Ok(await packageService.GetAllPackagesAsync(ct));
+        });
+        
+        app.MapPatch(Routes.ReceivePackages, [Authorize(Roles = "Admin")] async (
+            IPackageService packageService,
+            ReceivePackageRequestModel requestModel,
+            CancellationToken ct) =>
+        {
+            await packageService.ReceivePackageAsync(requestModel, ct);
             return Results.Ok("Package received!");
         });
         

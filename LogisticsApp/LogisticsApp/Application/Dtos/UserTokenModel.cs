@@ -1,3 +1,3 @@
 ﻿namespace LogisticsApp.DTO;
 
-public record  UserTokenModel(string Id, string Email, string UserName);
+public record  UserTokenModel(string Id, string Email, string UserName, List<string> Roles);
