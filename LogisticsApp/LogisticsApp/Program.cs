@@ -1,9 +1,6 @@
 using FluentValidation;
 using LogisticsApp.Application.Validation;
-using LogisticsApp.DTO;
 using LogisticsApp.Extensions;
-using LogisticsApp.Models;
-using Microsoft.AspNetCore.Identity;
 
 namespace LogisticsApp;
 
@@ -37,39 +34,8 @@ public class Program
         app.MapTransportEndpoints();
         app.MapTerminalsEndpoints();
 
-        using (var scope = app.Services.CreateScope())
-        {
-            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            
-            var roles = new[] {"Admin", "User"};
-
-            foreach (var role in roles)
-            {
-                if(!await roleManager.RoleExistsAsync(role))
-                    await roleManager.CreateAsync(new IdentityRole(role));
-            }
-        }
+        await app.SeedIdentityAsync();
         
-        using (var scope = app.Services.CreateScope())
-        {
-            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-
-            string email = "admin@gmail.com";
-            string password = "Admin1!";
-
-            if (await userManager.FindByEmailAsync(email) == null)
-            {
-                var user = new User();
-                user.UserName = email;
-                user.Email = email;
-                user.EmailConfirmed = true;
-                
-                await userManager.CreateAsync(user, password);
-                
-                await userManager.AddToRoleAsync(user, "Admin");
-            }
-        }
-        
-        app.Run();
+        await app.RunAsync();
     }
 }
