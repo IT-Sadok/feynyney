@@ -68,9 +68,9 @@ namespace LogisticsApp.Migrations
                     b.Property<int?>("TransportId")
                         .HasColumnType("integer");
 
-                    b.Property<decimal>("Weight")
+                    b.Property<double>("Weight")
                         .HasPrecision(10, 2)
-                        .HasColumnType("numeric(10,2)");
+                        .HasColumnType("double precision");
 
                     b.HasKey("Id");
 
@@ -121,9 +121,8 @@ namespace LogisticsApp.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Type")
                         .IsRequired()

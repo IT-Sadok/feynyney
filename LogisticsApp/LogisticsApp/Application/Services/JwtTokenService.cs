@@ -21,12 +21,17 @@ public class JwtTokenService : IJwtTokenService
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["Key"]!));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        var claims = new[]
+        var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, model.Id),
             new Claim(ClaimTypes.Email, model.Email ?? ""),
             new Claim(ClaimTypes.Name, model.UserName ?? ""),
         };
+
+        foreach (var role in model.Roles)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, role));
+        }
 
         var token = new JwtSecurityToken(
             issuer: jwt["Issuer"],

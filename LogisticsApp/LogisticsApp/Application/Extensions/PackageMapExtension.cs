@@ -42,4 +42,16 @@ public static class PackageMapExtension
             package.Status,
             package.SentAt);
     }
+    
+    public static PackageDetailedResponseModel ToPackageDetailedResponseModel(this Package package)
+    {
+        return new PackageDetailedResponseModel(
+            package.Name,
+            package.Id,
+            package.SenderUser.Email ?? "",
+            package.RecipientUser.Email ?? "",
+            package.TrackingNumber,
+            package.Status,
+            package.SentAt);
+    }
 }

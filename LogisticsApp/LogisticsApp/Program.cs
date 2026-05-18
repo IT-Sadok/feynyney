@@ -1,13 +1,12 @@
 using FluentValidation;
 using LogisticsApp.Application.Validation;
-using LogisticsApp.DTO;
 using LogisticsApp.Extensions;
 
 namespace LogisticsApp;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
@@ -32,7 +31,11 @@ public class Program
         app.MapAuthEndpoints();
         app.MapUserEndpoints();
         app.MapPackageEndpoints();
+        app.MapTransportEndpoints();
+        app.MapTerminalsEndpoints();
+
+        await app.SeedIdentityAsync();
         
-        app.Run();
+        await app.RunAsync();
     }
 }

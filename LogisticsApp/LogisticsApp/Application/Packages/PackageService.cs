@@ -16,25 +16,32 @@ public class PackageService : IPackageService
     private readonly IValidator<CreatePackageRequestModel> _validator;
     private readonly ITrackingNumberGenerator _tracking;
     private readonly IPackageRepository _packageRepository;
+    private readonly ITransportRepository _transportRepository;
+    private readonly ITerminalRepository _terminalRepository;
+    
 
     public PackageService(
         UserManager<User> userManager,
         IUserContext currentUser,
         IValidator<CreatePackageRequestModel> validator,
         ITrackingNumberGenerator tracking,
-        IPackageRepository packageRepository)
+        IPackageRepository packageRepository,
+        ITransportRepository transportRepository,
+        ITerminalRepository terminalRepository)
     {
         _userManager = userManager;
         _currentUser = currentUser;
         _validator = validator;
         _tracking = tracking;
         _packageRepository = packageRepository;
+        _transportRepository = transportRepository;
+        _terminalRepository = terminalRepository;
     }
     
     public async Task<PackageResponseModel> CreateAsync(CreatePackageRequestModel requestModel, CancellationToken ct)
     {
         // basic validation
-        await _validator.ValidateAndThrowAsync(requestModel, cancellationToken: ct);
+        await _validator.ValidateAndThrowAsync(requestModel, ct);
 
         // current user is a sender
         var sender = _currentUser.User;
@@ -45,16 +52,16 @@ public class PackageService : IPackageService
             throw new ArgumentException("Recipient not found");
         
         // terminal validation
-        if(!await _packageRepository.TerminalExistsAsync(requestModel.OriginTerminalId, ct))
+        if(!await _terminalRepository.TerminalExistsAsync(requestModel.OriginTerminalId, ct))
             throw new ArgumentException("Origin terminal not found");
         
-        if(!await _packageRepository.TerminalExistsAsync(requestModel.DestinationTerminalId, ct))
+        if(!await _terminalRepository.TerminalExistsAsync(requestModel.DestinationTerminalId, ct))
             throw new ArgumentException("Destination terminal not found");
         
         // transport validation
         if (requestModel.TransportId is not null)
         {
-            if(!await _packageRepository.TransportExistsAsync(requestModel.TransportId.Value, ct))
+            if(!await _transportRepository.TransportExistsAsync(requestModel.TransportId.Value, ct))
                 throw new ArgumentException("Transport not found");
         }
         
@@ -86,11 +93,31 @@ public class PackageService : IPackageService
         );
     }
 
-    public async Task<List<PackageResponseModel>> GetMyPackagesAsync(CancellationToken ct)
+    public async Task<List<PackageDetailedResponseModel>> GetAllPackagesAsync(CancellationToken ct)
+    {
+        var packages  = await _packageRepository.GetAllPackagesAsync(ct);
+        
+        return packages
+            .Select(x => x.ToPackageDetailedResponseModel())
+            .ToList();
+    }
+
+    public async Task<List<PackageResponseModel>> GetMyIncomingPackagesAsync(CancellationToken ct)
     {
         var currentUser = _currentUser.User;
         
-        var packages = await _packageRepository.GetPackagesByRecipientIdAsync(currentUser.UserId, ct);
+        var packages = await _packageRepository.GetIncomingPackagesAsync(currentUser.UserId, ct);
+        
+        return packages
+            .Select(x => x.ToPackageResponseModel())
+            .ToList();
+    }
+    
+    public async Task<List<PackageResponseModel>> GetMySentPackagesAsync(CancellationToken ct)
+    {
+        var currentUser = _currentUser.User;
+        
+        var packages = await _packageRepository.GetSentPackagesAsync(currentUser.UserId, ct);
         
         return packages.
             Select(x => x.ToPackageResponseModel())
@@ -107,5 +134,52 @@ public class PackageService : IPackageService
         }
         
         return package.ToPackageResponseModel();
+    }
+
+    public async Task ReceivePackageAsync(ReceivePackageRequestModel requestModel ,CancellationToken ct)
+    {
+        var currentUser = _currentUser.User;
+        
+        var packages = await _packageRepository.GetPackagesByIdsAsync(requestModel.Ids, ct);
+
+        if (packages.Count == requestModel.Ids.Count)
+        {
+            foreach (var package in packages)
+            {
+                switch (package.Status) 
+                {
+                    case PackageStatus.Received:
+                        throw new ArgumentException("Package is already received!");
+                
+                    // case PackageStatus.Sent: //TODO Make admin approve package status to "In Transit"
+                    case PackageStatus.InTransit:
+                        throw new ArgumentException("Package is not delivered yet!");
+                }
+                
+                package.Status = PackageStatus.Received;
+            }
+        }
+        else
+        {
+            throw new ArgumentException("Some packages were not found!");
+        }
+        
+        await _packageRepository.SaveAsync(ct);
+    }
+
+    public async Task ApprovePackageAsync(List<int> ids, CancellationToken ct)
+    {
+        var packages = await _packageRepository.GetPackagesByIdsAsync(ids, ct);
+
+        if (packages.Count == ids.Count)
+        {
+            foreach (var package in packages)
+            {
+                if (package.Status == PackageStatus.InTransit)
+                {
+                    package.Status = PackageStatus.InTransit;
+                }
+            }
+        }
     }
 }
