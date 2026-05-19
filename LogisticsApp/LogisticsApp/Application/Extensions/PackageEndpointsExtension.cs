@@ -46,11 +46,29 @@ public static class PackageEndpointsExtension
         
         app.MapPatch(Routes.ReceivePackages, [Authorize(Roles = "Admin")] async (
             IPackageService packageService,
-            ReceivePackageRequestModel requestModel,
+            ReceivePackagesRequestModel requestModel,
             CancellationToken ct) =>
         {
-            await packageService.ReceivePackageAsync(requestModel, ct);
+            await packageService.ReceivePackagesAsync(requestModel, ct);
             return Results.Ok("Package received!");
+        });
+        
+        app.MapPatch(Routes.ApprovePackages, [Authorize(Roles = "Admin")] async (
+            IPackageService packageService,
+            ApprovePackagesRequestModel requestModel,
+            CancellationToken ct) =>
+        {
+            await packageService.ApprovePackagesAsync(requestModel, ct);
+            return Results.Ok("Package approved!");
+        });
+        
+        app.MapPatch(Routes.DeliverPackages, [Authorize(Roles = "Admin")] async (
+            IPackageService packageService,
+            MarkPackagesDeliveredRequestModel requestModel,
+            CancellationToken ct) =>
+        {
+            await packageService.MarkPackagesDeliveredAsync(requestModel, ct);
+            return Results.Ok("Package delivered!");
         });
         
         return app;

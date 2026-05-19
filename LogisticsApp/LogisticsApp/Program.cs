@@ -1,6 +1,9 @@
 using FluentValidation;
 using LogisticsApp.Application.Validation;
+using LogisticsApp.Data;
 using LogisticsApp.Extensions;
+using LogisticsApp.Workers;
+using Microsoft.EntityFrameworkCore;
 
 namespace LogisticsApp;
 
@@ -15,9 +18,12 @@ public class Program
             .AddJwtAuthentication(builder.Configuration)
             .AddAppIdentity()
             .AddApplication()
+            .AddSeedSettings(builder.Configuration)
             .AddValidatorsFromAssemblyContaining<PackageModelValidation>()
             .AddAuthorization()
-            .AddSwagger();
+            .AddSwagger()
+            .AddHostedService<TransportAssignmentWorker>();
+            
 
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
@@ -34,6 +40,8 @@ public class Program
         app.MapTransportEndpoints();
         app.MapTerminalsEndpoints();
 
+        await app.ApplyMigrationAsync();
+        
         await app.SeedIdentityAsync();
         
         await app.RunAsync();

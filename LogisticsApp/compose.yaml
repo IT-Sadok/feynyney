@@ -1,0 +1,41 @@
+﻿version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: logistics_postgres
+    environment:
+      POSTGRES_DB: logistics_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d logistics_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  logisticsapp:
+    image: logisticsapp
+    build:
+      context: .
+      dockerfile: LogisticsApp/Dockerfile
+    container_name: logistics_api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=logistics_db;Username=postgres;Password=12345
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - Jwt__Key=2f6d8c4a9b1e7f3c5d2a8e6b4c1f9a7d
+      - Jwt__Issuer=LogisticsApp
+      - Jwt__Audience=LogisticsAppClient
+    ports:
+      - "5000:8080"
+
+volumes:
+  postgres_data:

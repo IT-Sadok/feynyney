@@ -9,5 +9,8 @@ public interface IPackageService
     Task<List<PackageResponseModel>> GetMyIncomingPackagesAsync(CancellationToken ct);
     Task<List<PackageResponseModel>> GetMySentPackagesAsync(CancellationToken ct);
     Task<PackageResponseModel> GetPackageByTrackingNumberAsync(string trackingNumber, CancellationToken ct);
-    Task ReceivePackageAsync(ReceivePackageRequestModel requestModel, CancellationToken ct);
+    Task ReceivePackagesAsync(ReceivePackagesRequestModel requestModel, CancellationToken ct);
+    Task ApprovePackagesAsync(ApprovePackagesRequestModel requestModel, CancellationToken ct);
+    Task MarkPackagesDeliveredAsync(MarkPackagesDeliveredRequestModel requestModel, CancellationToken ct);
+    Task TryAssignWaitingPackagesAsync(CancellationToken ct);
 }

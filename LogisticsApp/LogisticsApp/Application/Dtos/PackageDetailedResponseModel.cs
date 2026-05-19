@@ -8,5 +8,7 @@ public record PackageDetailedResponseModel(
     string SenderEmail,
     string RecipientEmail,
     string TrackingNumber,
-    PackageStatus Status,
-    DateTime SentAt);
+    string Status,
+    int? TransportId,
+    DateTime SentAt,
+    DateTime? DeliveredAt);

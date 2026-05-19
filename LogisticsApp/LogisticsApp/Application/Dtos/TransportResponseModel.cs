@@ -2,4 +2,4 @@
 
 namespace LogisticsApp.DTO;
 
-public record TransportResponseModel(int Id, string Type, TransportStatus Status);
+public record TransportResponseModel(int Id, string Type, string Status);

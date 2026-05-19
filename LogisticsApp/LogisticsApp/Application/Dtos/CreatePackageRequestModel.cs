@@ -5,6 +5,5 @@ public record CreatePackageRequestModel(
     double Weight,
     string RecipientEmail,
     int OriginTerminalId,
-    int DestinationTerminalId,
-    int? TransportId
+    int DestinationTerminalId
 );

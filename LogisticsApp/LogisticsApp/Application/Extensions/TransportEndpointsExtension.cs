@@ -19,6 +19,31 @@ public static class TransportEndpointsExtension
             return Results.Created($"/transports/{created.Id}", created);
         });
         
+        app.MapGet(Routes.AllTransports, [Authorize(Roles = "Admin")] async (
+            ITransportService transportService,
+            CancellationToken ct) =>
+        {
+            return Results.Ok(await transportService.GetAllTransportsAsync(ct));
+        });
+        
+        app.MapPatch(Routes.MarkTransportAvailable, [Authorize(Roles = "Admin")] async (
+            ITransportService transportService,
+            MarkTransportAvailableRequestModel requestModel,
+            CancellationToken ct) =>
+        {
+            await transportService.MarkTransportAvailableAsync(requestModel, ct);
+            return Results.Ok("Transport is marked as available!");
+        });
+        
+        app.MapPatch(Routes.MarkTransportUnavailable, [Authorize(Roles = "Admin")] async (
+            ITransportService transportService,
+            MarkTransportUnavailableRequestModel requestModel,
+            CancellationToken ct) =>
+        {
+            await transportService.MarkTransportUnavailableAsync(requestModel, ct);
+            return Results.Ok("Transport is marked as unavailable!");
+        });
+        
         return app;
     }
 }
