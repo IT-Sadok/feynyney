@@ -50,6 +50,21 @@ public class PackageRepository : IPackageRepository
     
     public Task<List<Package>> GetPackagesByIdsAsync(List<int> ids,CancellationToken ct)
     {
-        return _dbContext.Packages.Where(p => ids.Contains(p.Id)).ToListAsync(ct);
+        return _dbContext.Packages
+            .Where(p => ids.Contains(p.Id))
+            .ToListAsync(ct);
+    }
+    
+    public Task<List<Package>> GetPackagesByIdsWithTransportAsync(List<int> ids,CancellationToken ct)
+    {
+        return _dbContext.Packages
+            .Where(p => ids.Contains(p.Id))
+            .Include(t => t.Transport)
+            .ToListAsync(ct);
+    }
+    
+    public Task<List<Package>> GetWaitingPackagesAsync(CancellationToken ct)
+    {
+        return _dbContext.Packages.Where(p => p.Status == PackageStatus.WaitingForTransport).ToListAsync(ct); 
     }
 }

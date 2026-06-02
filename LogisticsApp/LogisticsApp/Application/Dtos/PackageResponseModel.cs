@@ -6,6 +6,7 @@ public record PackageResponseModel(
     string PackageName,
     int Id,
     string TrackingNumber,
-    PackageStatus Status,
-    DateTime SentAt
+    string Status,
+    DateTime SentAt,
+    DateTime? DeliveredAt
 );

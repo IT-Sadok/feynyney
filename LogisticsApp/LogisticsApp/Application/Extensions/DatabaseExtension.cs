@@ -9,7 +9,11 @@ public static class DatabaseExtension
     {
         services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(
-                config.GetConnectionString("DefaultConnection")));
+                config.GetConnectionString("DefaultConnection"),
+                npgsqlOptions =>
+                {
+                    npgsqlOptions.EnableRetryOnFailure();
+                }));
 
         return services;
     }

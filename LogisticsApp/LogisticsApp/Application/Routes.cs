@@ -17,9 +17,14 @@ public class Routes
     public const string MySentPackages = "/packages/my/sent";
     public const string PackageNumber = "/packages/track/{trackingNumber}";
     public const string ReceivePackages = "/packages/receive";
+    public const string ApprovePackages = "/packages/approve";
+    public const string DeliverPackages = "/packages/deliver";
     
     //transport
     public const string Transports = "/transports";
+    public const string AllTransports = "/transports/all";
+    public const string MarkTransportAvailable = "/transports/mark-available";
+    public const string MarkTransportUnavailable = "/transports/mark-unavailable";
     
     //terminal
     public const string Terminals = "/terminals";

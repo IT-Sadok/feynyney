@@ -25,9 +25,9 @@ public static class PackageMapExtension
             OriginTerminalId = requestModel.OriginTerminalId,
             DestinationTerminalId = requestModel.DestinationTerminalId,
 
-            TransportId = requestModel.TransportId,
+            TransportId = null,
 
-            Status = PackageStatus.Sent,
+            Status = PackageStatus.Created,
             SentAt = now,
             DeliveredAt = null
         };
@@ -39,8 +39,16 @@ public static class PackageMapExtension
             package.Name,
             package.Id,
             package.TrackingNumber,
-            package.Status,
-            package.SentAt);
+            package.Status switch
+            {
+                PackageStatus.Created => "created",
+                PackageStatus.InTransit => "in_transit",
+                PackageStatus.Delivered => "delivered",
+                PackageStatus.Received => "received",
+                _ => throw new ArgumentOutOfRangeException(nameof(package.Status), package.Status, null)
+            },
+            package.SentAt,
+            package.DeliveredAt);
     }
     
     public static PackageDetailedResponseModel ToPackageDetailedResponseModel(this Package package)
@@ -51,7 +59,17 @@ public static class PackageMapExtension
             package.SenderUser.Email ?? "",
             package.RecipientUser.Email ?? "",
             package.TrackingNumber,
-            package.Status,
-            package.SentAt);
+            package.Status switch
+            {
+                PackageStatus.Created => "created",
+                PackageStatus.WaitingForTransport => "waiting_for_transport",
+                PackageStatus.InTransit => "in_transit",
+                PackageStatus.Delivered => "delivered",
+                PackageStatus.Received => "received",
+                _ => throw new ArgumentOutOfRangeException(nameof(package.Status), package.Status, null)
+            },
+            package.TransportId,
+            package.SentAt,
+            package.DeliveredAt);
     }
 }

@@ -27,4 +27,26 @@ public class TransportRepository : ITransportRepository
     {
         return await _dbContext.Transports.AnyAsync(t => t.Id == id, ct);
     }
+
+    public async Task<List<Transport>> GetAllTransportsAsync(CancellationToken ct)
+    {
+        return await _dbContext.Transports.ToListAsync(ct);
+    }
+    
+    public Task<List<Transport>> GetTransportsByIdsAsync(List<int> ids,CancellationToken ct)
+    {
+        return _dbContext.Transports
+            .Where(p => ids.Contains(p.Id))
+            .ToListAsync(ct);
+    }
+
+    public async Task<Transport?> GetTransportAsync(int id, CancellationToken ct)
+    {
+        return await _dbContext.Transports.FirstOrDefaultAsync(t => t.Id == id, ct);
+    }
+
+    public async Task<List<Transport>> GetAvailableTransportsAsync(CancellationToken ct)
+    {
+        return await _dbContext.Transports.Where(t => t.Status == TransportStatus.Available).ToListAsync(ct);
+    }
 }

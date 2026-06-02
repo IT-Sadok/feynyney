@@ -59,11 +59,11 @@ public class PackageService : IPackageService
             throw new ArgumentException("Destination terminal not found");
         
         // transport validation
-        if (requestModel.TransportId is not null)
-        {
-            if(!await _transportRepository.TransportExistsAsync(requestModel.TransportId.Value, ct))
-                throw new ArgumentException("Transport not found");
-        }
+        // if (requestModel.TransportId is not null)
+        // {
+        //     if(!await _transportRepository.TransportExistsAsync(requestModel.TransportId.Value, ct))
+        //         throw new ArgumentException("Transport not found");
+        // }
         
         // generate tracking number
         string trackingNumber = _tracking.GenerateTrackingNumber();
@@ -84,13 +84,7 @@ public class PackageService : IPackageService
         await _packageRepository.SaveAsync(ct);
         
         // response
-        return new PackageResponseModel(
-            package.Name,
-            package.Id,
-            package.TrackingNumber,
-            package.Status,
-            package.SentAt
-        );
+        return package.ToPackageResponseModel();
     }
 
     public async Task<List<PackageDetailedResponseModel>> GetAllPackagesAsync(CancellationToken ct)
@@ -136,50 +130,103 @@ public class PackageService : IPackageService
         return package.ToPackageResponseModel();
     }
 
-    public async Task ReceivePackageAsync(ReceivePackageRequestModel requestModel ,CancellationToken ct)
+    public async Task ReceivePackagesAsync(ReceivePackagesRequestModel requestModel ,CancellationToken ct)
     {
-        var currentUser = _currentUser.User;
-        
         var packages = await _packageRepository.GetPackagesByIdsAsync(requestModel.Ids, ct);
 
-        if (packages.Count == requestModel.Ids.Count)
-        {
-            foreach (var package in packages)
-            {
-                switch (package.Status) 
-                {
-                    case PackageStatus.Received:
-                        throw new ArgumentException("Package is already received!");
-                
-                    // case PackageStatus.Sent: //TODO Make admin approve package status to "In Transit"
-                    case PackageStatus.InTransit:
-                        throw new ArgumentException("Package is not delivered yet!");
-                }
-                
-                package.Status = PackageStatus.Received;
-            }
-        }
-        else
-        {
+        if (packages.Count != requestModel.Ids.Count) 
             throw new ArgumentException("Some packages were not found!");
+        
+        foreach (var package in packages)
+        {
+            switch (package.Status) 
+            {
+                case PackageStatus.Received:
+                    throw new ArgumentException("Package is already received!");
+                
+                // case PackageStatus.Sent: //TODO Make admin approve package status to "In Transit"
+                case PackageStatus.InTransit:
+                    throw new ArgumentException("Package is not delivered yet!");
+            }
+                
+            package.Status = PackageStatus.Received;
         }
         
         await _packageRepository.SaveAsync(ct);
     }
 
-    public async Task ApprovePackageAsync(List<int> ids, CancellationToken ct)
+    public async Task ApprovePackagesAsync(ApprovePackagesRequestModel requestModel, CancellationToken ct)
     {
-        var packages = await _packageRepository.GetPackagesByIdsAsync(ids, ct);
+        var packages = await _packageRepository.GetPackagesByIdsAsync(requestModel.Ids, ct);
 
-        if (packages.Count == ids.Count)
+        if (packages.Count != requestModel.Ids.Count)
+            throw new ArgumentException("Some packages were not found!");
+        
+        var availableTransports = await  _transportRepository.GetAvailableTransportsAsync(ct);
+        
+        var assignedCount = Math.Min(packages.Count, availableTransports.Count);
+
+        foreach (var package in packages)
         {
-            foreach (var package in packages)
-            {
-                if (package.Status == PackageStatus.InTransit)
-                {
-                    package.Status = PackageStatus.InTransit;
-                }
-            }
+            if(package.Status !=  PackageStatus.Created)
+                throw new ArgumentException("Only packages with Created status can be approved.");
         }
+            
+        for (int i = 0; i < assignedCount; i++)
+        {
+            packages[i].Status = PackageStatus.InTransit;
+            packages[i].TransportId = availableTransports[i].Id;
+            availableTransports[i].Status = TransportStatus.InTransit;
+        }
+
+        for (int i = assignedCount; i < packages.Count; i++)
+        {
+            packages[i].Status = PackageStatus.WaitingForTransport;
+            packages[i].TransportId = null;
+        }
+        
+        await _packageRepository.SaveAsync(ct);
+    }
+
+    public async Task MarkPackagesDeliveredAsync(MarkPackagesDeliveredRequestModel requestModel, CancellationToken ct)
+    {
+        var packages = await _packageRepository.GetPackagesByIdsWithTransportAsync(requestModel.Ids, ct);
+
+        if (packages.Count != requestModel.Ids.Count) 
+            throw new ArgumentException("Some packages were not found!");
+
+        foreach (var package in packages)
+        {
+            if(package.Status !=  PackageStatus.InTransit)
+                throw new ArgumentException("Only packages with InTransit status can be marked as Delivered.");
+            
+            package.Status = PackageStatus.Delivered;
+            package.DeliveredAt = DateTime.UtcNow;
+
+            if(package.Transport == null)
+                throw new ArgumentException("InTransit package must have an assigned transport.");
+            
+            package.Transport.Status = TransportStatus.Available;
+        }
+        
+        await _packageRepository.SaveAsync(ct);
+    }
+
+    public async Task TryAssignWaitingPackagesAsync(CancellationToken ct)
+    {
+        var packages = await _packageRepository.GetWaitingPackagesAsync(ct);
+        
+        var availableTransports = await  _transportRepository.GetAvailableTransportsAsync(ct);
+        
+        var assignedCount = Math.Min(packages.Count, availableTransports.Count);
+            
+        for (int i = 0; i < assignedCount; i++)
+        {
+            packages[i].Status = PackageStatus.InTransit;
+            packages[i].TransportId = availableTransports[i].Id;
+            availableTransports[i].Status = TransportStatus.InTransit;
+        }
+        
+        await _packageRepository.SaveAsync(ct);
     }
 }
