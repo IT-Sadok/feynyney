@@ -10,12 +10,18 @@ public static class TransportMapExtension
         return new TransportResponseModel(
             transport.Id,
             transport.Type,
-            transport.Status switch
-            {
-                TransportStatus.Available => "available",
-                TransportStatus.InTransit => "in_transit",
-                TransportStatus.Unavailable => "unavailable",
-                _ => throw new ArgumentOutOfRangeException(nameof(transport.Status), transport.Status, null)
-            });
+            transport.Status.ToApiString());
+    }
+
+
+    public static string ToApiString(this TransportStatus status)
+    {
+        return status switch
+        {
+            TransportStatus.Available => "available",
+            TransportStatus.InTransit => "in_transit",
+            TransportStatus.Unavailable => "unavailable",
+            _ => throw new ArgumentOutOfRangeException(nameof(status), status, null)
+        };
     }
 }

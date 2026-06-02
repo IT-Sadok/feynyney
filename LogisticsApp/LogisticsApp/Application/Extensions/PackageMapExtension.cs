@@ -39,14 +39,7 @@ public static class PackageMapExtension
             package.Name,
             package.Id,
             package.TrackingNumber,
-            package.Status switch
-            {
-                PackageStatus.Created => "created",
-                PackageStatus.InTransit => "in_transit",
-                PackageStatus.Delivered => "delivered",
-                PackageStatus.Received => "received",
-                _ => throw new ArgumentOutOfRangeException(nameof(package.Status), package.Status, null)
-            },
+            package.Status.ToApiString(),
             package.SentAt,
             package.DeliveredAt);
     }
@@ -59,17 +52,22 @@ public static class PackageMapExtension
             package.SenderUser.Email ?? "",
             package.RecipientUser.Email ?? "",
             package.TrackingNumber,
-            package.Status switch
-            {
-                PackageStatus.Created => "created",
-                PackageStatus.WaitingForTransport => "waiting_for_transport",
-                PackageStatus.InTransit => "in_transit",
-                PackageStatus.Delivered => "delivered",
-                PackageStatus.Received => "received",
-                _ => throw new ArgumentOutOfRangeException(nameof(package.Status), package.Status, null)
-            },
+            package.Status.ToApiString(),
             package.TransportId,
             package.SentAt,
             package.DeliveredAt);
+    }
+
+    public static string ToApiString(this PackageStatus status)
+    {
+        return status switch
+        {
+            PackageStatus.Created => "created",
+            PackageStatus.WaitingForTransport => "waiting_for_transport",
+            PackageStatus.InTransit => "in_transit",
+            PackageStatus.Delivered => "delivered",
+            PackageStatus.Received => "received",
+            _ => throw new ArgumentOutOfRangeException(nameof(status), status, null)
+        };
     }
 }
