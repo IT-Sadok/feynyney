@@ -45,6 +45,8 @@ public class Program
         
         await app.SeedIdentityAsync();
         
+        app.MapGet("/", () => Results.Ok("Logistics API is running"));
+        
         await app.RunAsync();
     }
 }
