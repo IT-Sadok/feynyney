@@ -45,9 +45,6 @@ public class Program
         
         await app.SeedIdentityAsync();
         
-        //TODO this is a test commit, delete it afterwards
-        app.MapGet("/", () => Results.Ok("Logistics API is running"));
-        
         await app.RunAsync();
     }
 }
