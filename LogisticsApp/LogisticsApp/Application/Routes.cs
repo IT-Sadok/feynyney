@@ -19,6 +19,7 @@ public class Routes
     public const string ReceivePackages = "/packages/receive";
     public const string ApprovePackages = "/packages/approve";
     public const string DeliverPackages = "/packages/deliver";
+    public const string CancelPackages = "/packages/cancel";
     
     //transport
     public const string Transports = "/transports";

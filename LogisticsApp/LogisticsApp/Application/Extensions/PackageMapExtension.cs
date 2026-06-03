@@ -67,6 +67,7 @@ public static class PackageMapExtension
             PackageStatus.InTransit => "in_transit",
             PackageStatus.Delivered => "delivered",
             PackageStatus.Received => "received",
+            PackageStatus.Cancelled => "cancelled",
             _ => throw new ArgumentOutOfRangeException(nameof(status), status, null)
         };
     }

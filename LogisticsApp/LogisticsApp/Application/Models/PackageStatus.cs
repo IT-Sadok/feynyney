@@ -6,5 +6,6 @@ public enum PackageStatus
     WaitingForTransport = 2,
     InTransit = 3,
     Delivered = 4,
-    Received = 5
+    Received = 5,
+    Cancelled = 6
 }

@@ -13,4 +13,5 @@ public interface IPackageService
     Task ApprovePackagesAsync(ApprovePackagesRequestModel requestModel, CancellationToken ct);
     Task MarkPackagesDeliveredAsync(MarkPackagesDeliveredRequestModel requestModel, CancellationToken ct);
     Task TryAssignWaitingPackagesAsync(CancellationToken ct);
+    Task CancelPackageAsync(CancelPackageRequestModel requestModel, CancellationToken ct);
 }

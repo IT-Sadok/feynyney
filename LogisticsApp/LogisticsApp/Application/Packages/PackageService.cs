@@ -218,4 +218,22 @@ public class PackageService : IPackageService
         
         await _packageRepository.SaveAsync(ct);
     }
+
+    public async Task CancelPackageAsync(CancelPackageRequestModel requestModel, CancellationToken ct)
+    {
+        var packages  = await _packageRepository.GetPackagesByIdsAsync(requestModel.Ids, ct);
+        
+        if(packages.Count != requestModel.Ids.Count)
+            throw new ArgumentException("Some packages were not found!");
+        
+        if(packages.Any(package => package.Status != PackageStatus.Created && package.Status != PackageStatus.WaitingForTransport))
+            throw new ArgumentException("Only packages with Created or WaitingForTransport status can be cancelled.");
+
+        foreach (var package in packages)
+        {
+            package.Status = PackageStatus.Cancelled;
+        }
+        
+        await  _packageRepository.SaveAsync(ct);
+    }
 }
