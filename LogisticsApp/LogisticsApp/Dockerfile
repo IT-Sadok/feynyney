@@ -7,10 +7,11 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
-COPY ["LogisticsApp.csproj", "."]
-RUN dotnet restore "LogisticsApp.csproj"
+COPY ["LogisticsApp/LogisticsApp/LogisticsApp.csproj", "LogisticsApp/LogisticsApp/"]
+RUN dotnet restore "LogisticsApp/LogisticsApp/LogisticsApp.csproj"
 
 COPY . .
+WORKDIR "/src/LogisticsApp/LogisticsApp"
 RUN dotnet build "LogisticsApp.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
