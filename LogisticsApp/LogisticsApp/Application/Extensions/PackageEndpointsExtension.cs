@@ -71,6 +71,15 @@ public static class PackageEndpointsExtension
             return Results.Ok("Package delivered!");
         });
         
+        app.MapPatch(Routes.CancelPackages, [Authorize(Roles = "Admin")] async (
+            IPackageService packageService,
+            CancelPackageRequestModel requestModel,
+            CancellationToken ct) =>
+        {
+            await packageService.CancelPackageAsync(requestModel, ct);
+            return Results.Ok("Package cancelled!");
+        });
+        
         return app;
     }
     

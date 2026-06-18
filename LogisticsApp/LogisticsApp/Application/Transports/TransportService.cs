@@ -53,14 +53,13 @@ public class TransportService : ITransportService
         if (transports.Count != requestModel.Ids.Count)
             throw new ArgumentException("Some transports are missing!");
 
+        if (transports.Any(transport => transport.Status == TransportStatus.Unavailable))
+            throw new ArgumentException("Transport status should be available!");
+        
         foreach (var transport in transports)
         {
             if(transport.Status == TransportStatus.Available)
                 transport.Status = TransportStatus.Unavailable;
-            else
-            {
-                throw new ArgumentException("Transport status should be available!");
-            }
         }
         
         await _transportRepository.SaveChangesAsync(ct);
@@ -72,15 +71,14 @@ public class TransportService : ITransportService
 
         if (transports.Count != requestModel.Ids.Count)
             throw new ArgumentException("Some transports are missing!");
-
+        
+        if(transports.Any(transport => transport.Status == TransportStatus.Available))
+            throw new ArgumentException("Transport status should be unavailable!");
+        
         foreach (var transport in transports)
         {
             if(transport.Status == TransportStatus.Unavailable)
                 transport.Status = TransportStatus.Available;
-            else
-            {
-                throw new ArgumentException("Transport status should be unavailable!");
-            }
         }
         
         await _transportRepository.SaveChangesAsync(ct);

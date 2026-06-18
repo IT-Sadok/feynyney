@@ -31,7 +31,8 @@ public class Program
         var app = builder.Build();
         
         app.UseHttpsRedirection();
-        app.UseSwaggerIfDev();
+        app.UseSwagger();
+        app.UseSwaggerUI();
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapAuthEndpoints();

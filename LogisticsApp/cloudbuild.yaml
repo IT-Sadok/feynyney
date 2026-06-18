@@ -1,0 +1,31 @@
+﻿steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - europe-west4-docker.pkg.dev/$PROJECT_ID/logistics-repo/logistics-api:$COMMIT_SHA
+      - -f
+      - LogisticsApp/LogisticsApp/Dockerfile
+      - .
+
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - europe-west4-docker.pkg.dev/$PROJECT_ID/logistics-repo/logistics-api:$COMMIT_SHA
+
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - logistics-api
+      - --image=europe-west4-docker.pkg.dev/$PROJECT_ID/logistics-repo/logistics-api:$COMMIT_SHA
+      - --region=europe-west4
+      - --platform=managed
+      - --quiet
+
+images:
+  - europe-west4-docker.pkg.dev/$PROJECT_ID/logistics-repo/logistics-api:$COMMIT_SHA
+
+options:
+  logging: CLOUD_LOGGING_ONLY

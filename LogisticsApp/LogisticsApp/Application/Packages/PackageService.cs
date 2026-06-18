@@ -58,13 +58,6 @@ public class PackageService : IPackageService
         if(!await _terminalRepository.TerminalExistsAsync(requestModel.DestinationTerminalId, ct))
             throw new ArgumentException("Destination terminal not found");
         
-        // transport validation
-        // if (requestModel.TransportId is not null)
-        // {
-        //     if(!await _transportRepository.TransportExistsAsync(requestModel.TransportId.Value, ct))
-        //         throw new ArgumentException("Transport not found");
-        // }
-        
         // generate tracking number
         string trackingNumber = _tracking.GenerateTrackingNumber();
         
@@ -165,12 +158,9 @@ public class PackageService : IPackageService
         var availableTransports = await  _transportRepository.GetAvailableTransportsAsync(ct);
         
         var assignedCount = Math.Min(packages.Count, availableTransports.Count);
-
-        foreach (var package in packages)
-        {
-            if(package.Status !=  PackageStatus.Created)
-                throw new ArgumentException("Only packages with Created status can be approved.");
-        }
+        
+        if(packages.Any(package => package.Status != PackageStatus.Created))
+            throw new ArgumentException("Only packages with Created status can be approved.");
             
         for (int i = 0; i < assignedCount; i++)
         {
@@ -195,18 +185,17 @@ public class PackageService : IPackageService
         if (packages.Count != requestModel.Ids.Count) 
             throw new ArgumentException("Some packages were not found!");
 
+        if(packages.Any(package =>  package.Status != PackageStatus.InTransit))
+            throw new ArgumentException("Only packages with InTransit status can be marked as Delivered.");
+        
+        if(packages.Any(package => package.Transport == null))
+            throw new ArgumentException("InTransit package must have an assigned transport.");
+        
         foreach (var package in packages)
         {
-            if(package.Status !=  PackageStatus.InTransit)
-                throw new ArgumentException("Only packages with InTransit status can be marked as Delivered.");
-            
             package.Status = PackageStatus.Delivered;
             package.DeliveredAt = DateTime.UtcNow;
-
-            if(package.Transport == null)
-                throw new ArgumentException("InTransit package must have an assigned transport.");
-            
-            package.Transport.Status = TransportStatus.Available;
+            package.Transport!.Status = TransportStatus.Available;
         }
         
         await _packageRepository.SaveAsync(ct);
@@ -228,5 +217,23 @@ public class PackageService : IPackageService
         }
         
         await _packageRepository.SaveAsync(ct);
+    }
+
+    public async Task CancelPackageAsync(CancelPackageRequestModel requestModel, CancellationToken ct)
+    {
+        var packages  = await _packageRepository.GetPackagesByIdsAsync(requestModel.Ids, ct);
+        
+        if(packages.Count != requestModel.Ids.Count)
+            throw new ArgumentException("Some packages were not found!");
+        
+        if(packages.Any(package => package.Status != PackageStatus.Created && package.Status != PackageStatus.WaitingForTransport))
+            throw new ArgumentException("Only packages with Created or WaitingForTransport status can be cancelled.");
+
+        foreach (var package in packages)
+        {
+            package.Status = PackageStatus.Cancelled;
+        }
+        
+        await  _packageRepository.SaveAsync(ct);
     }
 }
